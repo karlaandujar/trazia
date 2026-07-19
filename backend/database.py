@@ -2,6 +2,7 @@ import os
 from supabase import create_client, Client
 from dotenv import load_dotenv
 
+
 # Load environment variables from .env file
 load_dotenv()
 
@@ -10,8 +11,8 @@ url: str = os.environ.get("SUPABASE_URL")
 key: str = os.environ.get("SUPABASE_KEY")
 supabase: Client = create_client(url, key)
 
-response = (
-    supabase.table("courses").select("*").execute()
-)
+def get_courses():
+    response = supabase.table("courses").select("*").execute()
+    courses = response.data
+    return courses
 
-print(response.data)
