@@ -8,6 +8,14 @@ export default function Login() {
     const [logPassword, setLogPassword] = useState("");
     const [signPassword, setSignPassword] = useState("");
 
+    // Clear the input fields after successful login or signup
+    const handleClear = (): void => {
+        setLogEmail('');
+        setLogPassword('');
+        setSignEmail('');
+        setSignPassword('');
+    }
+
     async function handleSignUp({}) {
         const { data, error } = await supabase.auth.signUp({
             email: signEmail,
@@ -18,6 +26,7 @@ export default function Login() {
         else {
             console.log(data);
             alert("Account created!");
+            handleClear();
         }
     }
 
@@ -31,6 +40,7 @@ export default function Login() {
         else {
             console.log(data);
             alert("Logged in!");
+            handleClear();
         }
     }
 
