@@ -36,6 +36,12 @@ export default function Dashboard() {
         return;
     }
 
+    // Clean the data
+    if (!courseNumber.trim() || !courseName.trim()) {
+        alert("Please fill in both course number and course name.");
+        return;
+    }
+
     console.log("Course added:", data);
 
     // Clear inputs
@@ -45,6 +51,7 @@ export default function Dashboard() {
     // Refresh table
     window.location.reload();
 }
+
     async function handleLogOut() {
         const { error } = await supabase.auth.signOut();
         if (error) {
@@ -72,7 +79,7 @@ export default function Dashboard() {
             
             <div className="pt-10">
                 <h1>Courses</h1>
-                <input placeholder="Enter course number" value={courseNumber} onChange={(e) => setCourseNumber(e.target.value)} />
+                <input maxLength={10} placeholder="Enter course number" value={courseNumber} onChange={(e) => setCourseNumber(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ""))} />
                 <input placeholder="Enter course name" value={courseName} onChange={(e) => setCourseName(e.target.value)} />
                 <button onClick={handleAddCourse}>Add Course</button>
             </div>

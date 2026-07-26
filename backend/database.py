@@ -18,6 +18,8 @@ def get_courses():
     return courses
 
 def create_course(course_name: str, course_number: str):
+    if not course_name.strip() or not course_number.strip():
+        raise ValueError("Course name and course number cannot be empty.")
     response = supabase.table("courses").insert({
         "course_name": course_name,
         "course_number": course_number
