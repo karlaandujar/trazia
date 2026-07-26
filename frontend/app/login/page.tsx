@@ -1,12 +1,15 @@
 "use client";
 import { useState, useEffect } from "react";
 import supabase from "../../lib/supabase";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
     const [logEmail, setLogEmail] = useState("");
     const [signEmail, setSignEmail] = useState("");
     const [logPassword, setLogPassword] = useState("");
     const [signPassword, setSignPassword] = useState("");
+    const [showVerif, setShowVerif] = useState(false);
+    const router = useRouter();
 
     // Clear the input fields after successful login or signup
     const handleClear = (): void => {
@@ -16,20 +19,22 @@ export default function Login() {
         setSignPassword('');
     }
 
+    // Handle user sign up and show verification card
     async function handleSignUp({}) {
         const { data, error } = await supabase.auth.signUp({
             email: signEmail,
             password: signPassword,
         });
 
-        if (error) console.log(error.message);
-        else {
-            console.log(data);
-            alert("Account created!");
-            handleClear();
+        if (error) {
+            console.log(error.message);
+            return;
         }
+
+        setShowVerif(true);
     }
 
+    // Handle user log in and redirect to dashboard
     async function handleLogin({ }) {
         const { data, error } = await supabase.auth.signInWithPassword({
             email: logEmail,
@@ -39,10 +44,35 @@ export default function Login() {
         if (error) console.log(error.message);
         else {
             console.log(data);
+            router.push("/dashboard");
             alert("Logged in!");
             handleClear();
         }
     }
+
+    // Check if the user has verified their email every 5 seconds
+    useEffect(() => {
+        if (!showVerif) return;
+
+        const interval = setInterval(async () => {
+            const { error } = await supabase.auth.signInWithPassword({
+                email: signEmail,
+                password: signPassword,
+            });
+
+            if (error) {
+                if (error.message!== "Email not confirmed") {
+                    console.error(error.message);
+                }
+                return;
+            }
+
+            clearInterval(interval);
+            router.push("/dashboard");
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, [showVerif, signEmail, signPassword, router]);
 
 
     return(
@@ -68,7 +98,12 @@ export default function Login() {
                 <button onClick={handleSignUp}>Sign Up</button>
             </div>
 
-            
+            {showVerif && (
+                <div>
+                    <h2> Verify your email </h2>
+                    <p> We've sent a verification link to {signEmail}. Please check your inbox and click the link to verify your account. </p>
+                </div>
+            )}
         </div>
     )
 }

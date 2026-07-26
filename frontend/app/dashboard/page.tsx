@@ -1,5 +1,8 @@
 "use client";
+import supabase from "@/lib/supabase";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+
 
 export default function Dashboard() {
     type Course = {
@@ -11,6 +14,7 @@ export default function Dashboard() {
     const [courses, setCourses] = useState<Course[]>([]);
     const [courseName, setCourseName] = useState("");
     const [courseNumber, setCourseNumber] = useState("");
+    const router = useRouter();
 
     
     async function handleAddCourse() {
@@ -41,6 +45,14 @@ export default function Dashboard() {
     // Refresh table
     window.location.reload();
 }
+    async function handleLogOut() {
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+            console.error("Error logging out:", error.message);
+        } else {
+            router.push("/login")
+        }
+    }
 
     useEffect(() => {
     fetch("http://127.0.0.1:8000/courses")
@@ -86,7 +98,10 @@ export default function Dashboard() {
                     </tbody>
                     </table>
                 </div>
+            </div>
 
+            <div className="pt-10">
+                <button onClick={handleLogOut}>Log Out</button>
             </div>
         </div>
     )
