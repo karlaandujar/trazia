@@ -31,6 +31,7 @@ export default function Login() {
             return;
         }
 
+        handleClear();
         setShowVerif(true);
     }
 
@@ -78,29 +79,29 @@ export default function Login() {
     return(
         <div>
             <div>
-                <h1>
+                <h1 className="font-bold text-3xl pt-4 pl-4">
                     Welcome to the Trazia App!
                 </h1>
-                <h2> Please log in or sign up. </h2>
+                <h2 className="pl-4"> Please log in or sign up. </h2>
             </div>
 
             <div>
-                <h3> Log In </h3>
-                <input type="text" placeholder="Email" value={logEmail} onChange={(e) => setLogEmail(e.target.value)} />
-                <input type="password" placeholder="Password" value={logPassword} onChange={(e) => setLogPassword(e.target.value)} />
-                <button onClick={handleLogin}>Log In</button>
+                <h3 className="font-bold text-xl pt-7 pl-4"> Log In </h3>
+                <input className="border ml-4 p-2" type="text" placeholder="Email" value={logEmail} onChange={(e) => setLogEmail(e.target.value)} />
+                <input className="border ml-1 p-2" type="password" placeholder="Password" value={logPassword} onChange={(e) => setLogPassword(e.target.value)} />
+                <button className="p-2 ml-3 rounded hover:bg-blue-200 border" onClick={handleLogin}>Log In</button>
             </div>
 
             <div>
-                <h3> Sign Up </h3>
-                <input type="text" placeholder="Email" value={signEmail} onChange={(e) => setSignEmail(e.target.value)} />
-                <input type="password" placeholder="Password" value={signPassword} onChange={(e) => setSignPassword(e.target.value)} />
-                <button onClick={handleSignUp}>Sign Up</button>
+                <h3 className="font-bold text-xl pt-7 pl-4"> Sign Up </h3>
+                <input className="border ml-4 p-2" type="text" placeholder="Email" value={signEmail} onChange={(e) => setSignEmail(e.target.value)} />
+                <input className="border ml-1 p-2" type="password" placeholder="Password" value={signPassword} onChange={(e) => setSignPassword(e.target.value)} />
+                <button className="p-2 ml-3 rounded hover:bg-blue-200 border" onClick={handleSignUp}>Sign Up</button>
             </div>
 
             {showVerif && (
-                <div>
-                    <h2> Verify your email </h2>
+                <div className="border p-4 bg-gray-100 max-w-md mx-auto shadow-lg w-full h-full">
+                    <h2 className="text-xl font-bold mb-2 text-center"> Verify your email </h2>
                     <p> We've sent a verification link to {signEmail}. Please check your inbox and click the link to verify your account. </p>
                 </div>
             )}

@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from database import get_courses
 from database import create_course
@@ -22,3 +22,7 @@ def read_courses():
 @app.post("/courses")
 def add_course(course: CourseCreate):
     return create_course(course.course_name, course.course_number)
+
+@app.post("/upload/")
+async def upload_schedule(file: UploadFile):
+    return {"filename": file.filename}

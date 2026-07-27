@@ -14,9 +14,25 @@ export default function Dashboard() {
     const [courses, setCourses] = useState<Course[]>([]);
     const [courseName, setCourseName] = useState("");
     const [courseNumber, setCourseNumber] = useState("");
+    const [file, setFile] = useState<File | null>(null);
     const router = useRouter();
 
-    
+    async function handleFileUpload() {
+        if (!file) {
+            alert("Please select a file to upload.");
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await fetch("http://127.0.0.1:8000/upload/", {
+            method: "POST",
+            body: formData,
+        });
+    }
+
+    // Handle adding a new course
     async function handleAddCourse() {
     const response = await fetch("http://127.0.0.1:8000/courses", {
         method: "POST",
@@ -72,23 +88,30 @@ export default function Dashboard() {
     return (
         <div>
             <div>
-                <h1>Dashboard</h1>
-                <h3>Setup your semester</h3>
+                <h1 className="font-bold text-3xl pt-4 pl-4">Dashboard</h1>
+                <h3 className="pl-4">Setup your semester</h3>
                 
             </div>
             
-            <div className="pt-10">
-                <h1>Courses</h1>
-                <input maxLength={10} placeholder="Enter course number" value={courseNumber} onChange={(e) => setCourseNumber(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ""))} />
-                <input placeholder="Enter course name" value={courseName} onChange={(e) => setCourseName(e.target.value)} />
-                <button onClick={handleAddCourse}>Add Course</button>
+            <div>
+                <h1 className="font-bold text-xl pt-10 pl-4">Courses</h1>
+                <div>
+                    <input className="border ml-4 p-2 mt-2 hover:bg-gray-200" type="file" onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)} />
+                    <button className="p-2 ml-2 rounded hover:bg-blue-200 border" onClick={handleFileUpload}>Upload Course Schedule</button>
+                </div>
+                
+                <div className="mt-3">
+                    <input className="border ml-4 p-2" maxLength={10} placeholder="Enter course number" value={courseNumber} onChange={(e) => setCourseNumber(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ""))} />
+                    <input className="border ml-1 p-2" placeholder="Enter course name" value={courseName} onChange={(e) => setCourseName(e.target.value)} />
+                    <button className="p-2 ml-3 rounded hover:bg-blue-200 border" onClick={handleAddCourse}>Add Course</button>
+                </div>
             </div>
 
             <div className="pt-10">
-                <h1>My courses</h1>
+                <h1 className="font-bold text-xl pt-4 pl-4">My courses</h1>
 
-                <div className="flex justify-start mt-4">
-                    <table className="border-collapse border border-gray-400">
+                <div className="flex justify-start">
+                    <table className="border-collapse border border-gray-400 ml-4">
                     <thead>
                         <tr>
                         <th className="border border-gray-400 px-4 py-1">Course Number</th>
@@ -108,7 +131,7 @@ export default function Dashboard() {
             </div>
 
             <div className="pt-10">
-                <button onClick={handleLogOut}>Log Out</button>
+                <button className="p-2 ml-3 rounded hover:bg-blue-200 border" onClick={handleLogOut}>Log Out</button>
             </div>
         </div>
     )
