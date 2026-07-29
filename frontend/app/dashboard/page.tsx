@@ -15,6 +15,7 @@ export default function Dashboard() {
     const [courseName, setCourseName] = useState("");
     const [courseNumber, setCourseNumber] = useState("");
     const [file, setFile] = useState<File | null>(null);
+    const [selectedCourse, setSelectedCourse] = useState("");
     const router = useRouter();
 
     async function handleFileUpload() {
@@ -25,6 +26,7 @@ export default function Dashboard() {
         
         const formData = new FormData();
         formData.append("file", file);
+        formData.append("course_id", selectedCourse);
 
         const response = await fetch("http://127.0.0.1:8000/upload/", {
             method: "POST",
@@ -96,6 +98,16 @@ export default function Dashboard() {
             <div>
                 <h1 className="font-bold text-xl pt-10 pl-4">Courses</h1>
                 <div>
+
+                    <select className="border p-2" value={selectedCourse} onChange={(e) => setSelectedCourse(e.target.value)}>
+                        <option value="">Select a course</option>
+                        {courses.map((course) => (
+                            <option key={course.id} value={course.id}>
+                                {course.course_number} - {course.course_name}
+                            </option>
+                        ))}
+                    </select>
+
                     <input className="border ml-4 p-2 mt-2 hover:bg-gray-200" type="file" onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)} />
                     <button className="p-2 ml-2 rounded hover:bg-blue-200 border" onClick={handleFileUpload}>Upload Course Schedule</button>
                 </div>

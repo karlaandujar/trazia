@@ -17,6 +17,14 @@ def get_courses():
     courses = response.data
     return courses
 
+def get_course_by_id(course_id: int):
+    response = supabase.table("courses").select("*").eq("id", course_id).execute()
+    course = response.data
+    if course:
+        return course[0]  # Return the first (and only) course found
+    else:
+        return None  # Return None if no course is found with the given ID
+
 def create_course(course_name: str, course_number: str):
     if not course_name.strip() or not course_number.strip():
         raise ValueError("Course name and course number cannot be empty.")
@@ -25,3 +33,5 @@ def create_course(course_name: str, course_number: str):
         "course_number": course_number
     }).execute()
     return response.data
+
+#have an upload_assignments func to upload everything into the assignments table but just store course id and asisngment

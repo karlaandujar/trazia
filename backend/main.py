@@ -1,9 +1,10 @@
-from fastapi import FastAPI, UploadFile
+from uuid import UUID
+from fastapi import FastAPI, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pypdf import PdfReader
-from database import get_courses
-from database import create_course
+from database import get_courses, create_course, get_course_by_id
 from models import CourseCreate
+from ai import get_assignments
 
 app = FastAPI()
     
@@ -24,10 +25,18 @@ def read_courses():
 def add_course(course: CourseCreate):
     return create_course(course.course_name, course.course_number)
 
-@app.post("/upload/")
-async def upload_schedule(file: UploadFile):
+# Function to extract text from a PDF file
+def read_pdf(file: UploadFile):
     reader = PdfReader(file.file)
     text = ""
     for page in reader.pages:
         text += page.extract_text()
-    print(text)
+    return text
+
+@app.post("/upload/")
+async def upload_schedule(file: UploadFile, course_id: UUID = Form(...)):
+    text = read_pdf(file)
+    course = get_course_by_id(course_id)
+    print(get_assignments(text))
+    print("COURSE ", course)
+    print("COURSE ID ", course_id)
