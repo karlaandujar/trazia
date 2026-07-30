@@ -2,6 +2,7 @@
 import supabase from "@/lib/supabase";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Session } from "@supabase/supabase-js";
 
 
 export default function Dashboard() {
@@ -16,6 +17,7 @@ export default function Dashboard() {
     const [courseNumber, setCourseNumber] = useState("");
     const [file, setFile] = useState<File | null>(null);
     const [selectedCourse, setSelectedCourse] = useState("");
+    const [session, setSession] = useState<Session | null>(null);
     const router = useRouter();
 
     async function handleFileUpload() {
@@ -24,22 +26,28 @@ export default function Dashboard() {
             return;
         }
         
+        const token = session?.access_token;
         const formData = new FormData();
         formData.append("file", file);
         formData.append("course_id", selectedCourse);
 
         const response = await fetch("http://127.0.0.1:8000/upload/", {
             method: "POST",
+            headers: {
+                "Authorization": "Bearer " + token
+            },
             body: formData,
         });
     }
 
     // Handle adding a new course
     async function handleAddCourse() {
+        const token = session?.access_token;
         const response = await fetch("http://127.0.0.1:8000/courses", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
             },
             body: JSON.stringify({
                 course_name: courseName,
@@ -74,17 +82,18 @@ export default function Dashboard() {
         if (error) {
             console.error("Error logging out:", error.message);
         } else {
-            router.push("/login")
+            router.push("/login");
         }
     }
 
     async function loadData(){
         // Check if there is a session
         const { data } = await supabase.auth.getSession()
-        if (!data.session) {
-            router.push("/login")
+        if (!data.session){
+            router.push("/login");
         }
         else{
+            setSession(data.session);
             const token = data.session.access_token
             
             fetch("http://127.0.0.1:8000/courses", { headers: {"Authorization": "Bearer " + token}})
