@@ -11,9 +11,11 @@ url: str = os.environ.get("SUPABASE_URL")
 key: str = os.environ.get("SUPABASE_KEY")
 supabase: Client = create_client(url, key)
 
+def get_user(token):
+    return supabase.auth.get_user(token)
 
-def get_courses():
-    response = supabase.table("courses").select("*").execute()
+def get_courses(user_id):
+    response = supabase.table("courses").select("*").eq("user_id", user_id).execute()
     courses = response.data
     return courses
 

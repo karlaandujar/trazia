@@ -36,39 +36,38 @@ export default function Dashboard() {
 
     // Handle adding a new course
     async function handleAddCourse() {
-    const response = await fetch("http://127.0.0.1:8000/courses", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            course_name: courseName,
-            course_number: courseNumber,
-        }),
-    });
+        const response = await fetch("http://127.0.0.1:8000/courses", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                course_name: courseName,
+                course_number: courseNumber,
+            }),
+        });
 
-    const data = await response.json();
+        const data = await response.json();
+        if (!response.ok) {
+            console.error("Error adding course:", data);
+            return;
+        }
 
-    if (!response.ok) {
-        console.error("Error adding course:", data);
-        return;
+        // Clean the data
+        if (!courseNumber.trim() || !courseName.trim()) {
+            alert("Please fill in both course number and course name.");
+            return;
+        }
+        
+        console.log("Course added:", data);
+
+        // Clear inputs
+        setCourseName("");
+        setCourseNumber("");
+
+        // Refresh table
+        window.location.reload();
     }
-
-    // Clean the data
-    if (!courseNumber.trim() || !courseName.trim()) {
-        alert("Please fill in both course number and course name.");
-        return;
-    }
-
-    console.log("Course added:", data);
-
-    // Clear inputs
-    setCourseName("");
-    setCourseNumber("");
-
-    // Refresh table
-    window.location.reload();
-}
 
     async function handleLogOut() {
         const { error } = await supabase.auth.signOut();
@@ -79,13 +78,28 @@ export default function Dashboard() {
         }
     }
 
+    async function loadData(){
+        // Check if there is a session
+        const { data } = await supabase.auth.getSession()
+        if (!data.session) {
+            router.push("/login")
+        }
+        else{
+            const token = data.session.access_token
+            
+            fetch("http://127.0.0.1:8000/courses", { headers: {"Authorization": "Bearer " + token}})
+            .then((response) => response.json())
+            .then((data) => {
+            setCourses(data);
+            });
+        }
+    }
+
+    // Load courses from backend
     useEffect(() => {
-    fetch("http://127.0.0.1:8000/courses")
-      .then((response) => response.json())
-      .then((data) => {
-        setCourses(data);
-      });
+        loadData()
     }, []);
+
 
     return (
         <div>

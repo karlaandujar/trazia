@@ -1,8 +1,8 @@
 from uuid import UUID
-from fastapi import FastAPI, UploadFile, Form
+from fastapi import FastAPI, UploadFile, Form, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pypdf import PdfReader
-from database import get_courses, create_course, get_course_by_id
+from database import get_courses, create_course, get_course_by_id, get_user
 from models import CourseCreate
 from ai import get_assignments
 
@@ -18,8 +18,17 @@ app.add_middleware(
 
 
 @app.get("/courses")
-def read_courses():
-    return get_courses()
+def read_courses(request: Request):
+    token = request.headers.get("Authorization")
+    if (token is None): 
+        raise HTTPException(
+            status_code=401,
+            detail="Not authenticated"
+        )
+    clean_token = token[7:]
+    user_id = get_user(clean_token).user.id
+
+    return get_courses(user_id)
 
 @app.post("/courses")
 def add_course(course: CourseCreate):
