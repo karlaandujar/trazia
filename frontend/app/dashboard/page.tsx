@@ -20,25 +20,28 @@ export default function Dashboard() {
     const [session, setSession] = useState<Session | null>(null);
     const router = useRouter();
 
+    
+    // Function that handles PDF uploads for course additions
     async function handleFileUpload() {
         if (!file) {
             alert("Please select a file to upload.");
             return;
         }
-        
+        // Get user token and create form with necessary data
         const token = session?.access_token;
         const formData = new FormData();
         formData.append("file", file);
         formData.append("course_id", selectedCourse);
-
+        // POST method to send the file to the backend
         const response = await fetch("http://127.0.0.1:8000/upload/", {
             method: "POST",
             headers: {
                 "Authorization": "Bearer " + token
             },
-            body: formData,
+            body: formData
         });
     }
+
 
     // Handle adding a new course
     async function handleAddCourse() {
@@ -54,38 +57,37 @@ export default function Dashboard() {
                 course_number: courseNumber,
             }),
         });
-
+        // Ensure no errors in adding the course
         const data = await response.json();
         if (!response.ok) {
             console.error("Error adding course:", data);
             return;
         }
-
         // Clean the data
         if (!courseNumber.trim() || !courseName.trim()) {
             alert("Please fill in both course number and course name.");
             return;
         }
-        
+        // Log that the course was added
         console.log("Course added:", data);
-
         // Clear inputs
         setCourseName("");
         setCourseNumber("");
-
         // Refresh table
         window.location.reload();
     }
 
+    // Function to log out a user when button is clicked
     async function handleLogOut() {
         const { error } = await supabase.auth.signOut();
         if (error) {
             console.error("Error logging out:", error.message);
         } else {
-            router.push("/login");
+            router.push("/login"); // Send them back to the login screen
         }
     }
 
+    // Loads the data like session and user
     async function loadData(){
         // Check if there is a session
         const { data } = await supabase.auth.getSession()
@@ -122,7 +124,7 @@ export default function Dashboard() {
                 <h1 className="font-bold text-xl pt-10 pl-4">Courses</h1>
                 <div>
 
-                    <select className="border p-2" value={selectedCourse} onChange={(e) => setSelectedCourse(e.target.value)}>
+                    <select className="border p-2 ml-4" value={selectedCourse} onChange={(e) => setSelectedCourse(e.target.value)}>
                         <option value="">Select a course</option>
                         {courses.map((course) => (
                             <option key={course.id} value={course.id}>
@@ -136,7 +138,7 @@ export default function Dashboard() {
                 </div>
                 
                 <div className="mt-3">
-                    <input className="border ml-4 p-2" maxLength={10} placeholder="Enter course number" value={courseNumber} onChange={(e) => setCourseNumber(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ""))} />
+                    <input className="border ml-4 p-2" maxLength={10} placeholder="Enter course number" value={courseNumber} onChange={(e) => setCourseNumber(e.target.value.toUpperCase().replace(/[^A-Z0-9 ]/g, ""))} />
                     <input className="border ml-1 p-2" placeholder="Enter course name" value={courseName} onChange={(e) => setCourseName(e.target.value)} />
                     <button className="p-2 ml-3 rounded hover:bg-blue-200 border" onClick={handleAddCourse}>Add Course</button>
                 </div>

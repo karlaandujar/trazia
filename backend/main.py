@@ -2,7 +2,7 @@ from uuid import UUID
 from fastapi import FastAPI, UploadFile, Form, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pypdf import PdfReader
-from database import get_courses, create_course, get_course_by_id, get_user
+from database import get_courses, create_course, get_course_by_id, get_user, upload_assignments
 from models import CourseCreate
 from ai import get_assignments
 
@@ -16,9 +16,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-@app.get("/courses")
-def read_courses(request: Request):
+# Function to get the current user id
+def get_current_user(request: Request):
     token = request.headers.get("Authorization")
     if (token is None): 
         raise HTTPException(
@@ -26,13 +25,19 @@ def read_courses(request: Request):
             detail="Not authenticated"
         )
     clean_token = token[7:]
-    user_id = get_user(clean_token).user.id
+    return get_user(clean_token).user.id
 
+# Endpoint for reading courses
+@app.get("/courses")
+def read_courses(request: Request):
+    user_id = get_current_user(request)
     return get_courses(user_id)
 
+# Endpoint for POST method to courses table (ex. adding a course)
 @app.post("/courses")
-def add_course(course: CourseCreate):
-    return create_course(course.course_name, course.course_number)
+def add_course(request: Request, course: CourseCreate):
+    user_id = get_current_user(request)
+    return create_course(course.course_name, course.course_number, user_id)
 
 # Function to extract text from a PDF file
 def read_pdf(file: UploadFile):
@@ -42,10 +47,19 @@ def read_pdf(file: UploadFile):
         text += page.extract_text()
     return text
 
+# Endpoint for uploading a PDF file
 @app.post("/upload/")
-async def upload_schedule(file: UploadFile, course_id: UUID = Form(...)):
+async def upload_schedule(request: Request, file: UploadFile, course_id: UUID = Form(...)):
+    user_id = get_current_user(request)
     text = read_pdf(file)
-    course = get_course_by_id(course_id)
-    print(get_assignments(text))
-    print("COURSE ", course)
-    print("COURSE ID ", course_id)
+    # Get valid course that the assignments belong to
+    course = get_course_by_id(course_id, user_id)
+    if (course is None):
+        raise HTTPException(
+            status_code=404,
+            detail="Null course"
+        )
+
+    assignments = get_assignments(text)
+    upload_assignments(course_id, assignments)
+    return "Upload schedule success"
