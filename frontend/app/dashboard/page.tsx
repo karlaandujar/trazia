@@ -12,7 +12,17 @@ export default function Dashboard() {
         course_name: string;
     };
 
+    type Assignment = {
+        id: number;
+        title: string;
+        type: string;
+        due_date: string;
+        points: number;
+        weight: number;
+    };
+
     const [courses, setCourses] = useState<Course[]>([]);
+    const [assignments, setAssignments] = useState<Assignment[]>([]);
     const [courseName, setCourseName] = useState("");
     const [courseNumber, setCourseNumber] = useState("");
     const [file, setFile] = useState<File | null>(null);
@@ -101,7 +111,15 @@ export default function Dashboard() {
             fetch("http://127.0.0.1:8000/courses", { headers: {"Authorization": "Bearer " + token}})
             .then((response) => response.json())
             .then((data) => {
-            setCourses(data);
+                setCourses(data);
+            });
+
+            fetch("http://127.0.0.1:8000/assignments", { headers: {"Authorization": "Bearer " + token}})
+            .then((response) => response.json())
+            .then((data) => {
+                setAssignments(data);
+                console.log(data);
+                console.log(Array.isArray(data));
             });
         }
     }
@@ -167,6 +185,35 @@ export default function Dashboard() {
                 </div>
             </div>
 
+
+            <div className="pt-10">
+                <h1 className="font-bold text-xl pt-4 pl-4">My assignments</h1>
+
+                <div className="flex justify-start">
+                    <table className="border-collapse border border-gray-400 ml-4">
+                    <thead>
+                        <tr>
+                        <th className="border border-gray-400 px-4 py-1">Title</th>
+                        <th className="border border-gray-400 px-4 py-1">Type</th>
+                        <th className="border border-gray-400 px-4 py-1">Due Date</th>
+                        <th className="border border-gray-400 px-4 py-1">Points</th>
+                        <th className="border border-gray-400 px-4 py-1">Weight</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {assignments.map((assignment) => (
+                            <tr key={assignment.id}>
+                                <td className="border border-gray-400 px-4 py-1">{assignment.title}</td>
+                                <td className="border border-gray-400 px-4 py-1">{assignment.type}</td>
+                                <td className="border border-gray-400 px-4 py-1">{assignment.due_date}</td>
+                                <td className="border border-gray-400 px-4 py-1">{assignment.points}</td>
+                                <td className="border border-gray-400 px-4 py-1">{assignment.weight}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                    </table>
+                </div>
+            </div>
             <div className="pt-10">
                 <button className="p-2 ml-3 rounded hover:bg-blue-200 border" onClick={handleLogOut}>Log Out</button>
             </div>

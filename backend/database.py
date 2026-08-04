@@ -14,6 +14,15 @@ supabase: Client = create_client(url, key)
 def get_user(token):
     return supabase.auth.get_user(token)
 
+def get_assignments(user_id):
+    # Get the user's courses and put them into a list of course ids
+    courses = get_courses(user_id)
+    course_ids = [course["id"] for course in courses]
+
+    # Get all assignments for the user's courses
+    response = supabase.table("assignments").select("*").in_("course_id", course_ids).execute()
+    return response.data
+
 def get_courses(user_id):
     response = supabase.table("courses").select("*").eq("user_id", user_id).execute()
     courses = response.data

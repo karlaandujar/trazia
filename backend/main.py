@@ -2,9 +2,9 @@ from uuid import UUID
 from fastapi import FastAPI, UploadFile, Form, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pypdf import PdfReader
-from database import get_courses, create_course, get_course_by_id, get_user, upload_assignments
+from database import get_courses, create_course, get_course_by_id, get_user, upload_assignments, get_assignments
 from models import CourseCreate
-from ai import get_assignments
+from ai import get_assignments_from_sched
 
 app = FastAPI()
     
@@ -26,6 +26,12 @@ def get_current_user(request: Request):
         )
     clean_token = token[7:]
     return get_user(clean_token).user.id
+
+# Endpoint for reading assignments
+@app.get("/assignments")
+def read_assignments(request: Request):
+    user_id = get_current_user(request)
+    return get_assignments(user_id)
 
 # Endpoint for reading courses
 @app.get("/courses")
@@ -60,6 +66,6 @@ async def upload_schedule(request: Request, file: UploadFile, course_id: UUID = 
             detail="Null course"
         )
 
-    assignments = get_assignments(text)
+    assignments = get_assignments_from_sched(text)
     upload_assignments(course_id, assignments)
     return "Upload schedule success"

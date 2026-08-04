@@ -9,7 +9,7 @@ key = os.getenv("GEMINI_API_KEY")
 client = genai.Client(api_key=key)
 
 # Function to extract assignments from text using the Gemini API
-def get_assignments(text):
+def get_assignments_from_sched(text):
     interaction = client.interactions.create(
         model="gemini-3.1-flash-lite",
         input="""Extract all the assignments, exams, quizzes, labs, projects, discussions, participation, and deadlines from the course schedule.
