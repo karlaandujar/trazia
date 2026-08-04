@@ -78,6 +78,29 @@ export default function Login() {
 
     return(
         <div>
+            {/* Navigation bar */}
+            <nav className="bg-white text-white sticky top-0 z-50 border-b-4 border-gray-100 justify-between">
+                <div className="mx-auto px-6">
+                    <div className="relative flex justify-between align-items-center h-20">
+
+                        <div className="flex items-center absolute left-0 inset-y-0">
+                            <h1 className="text-4xl font-semibold tracking-widest text-gray-900">Trazia</h1>
+                        </div>
+
+                        <div className="flex items-center absolute left-1/2 -translate-x-1/2 inset-y-0 gap-10">
+                            <h1 className="text-gray-700 text-2xl hover:text-black transition duration-300">About</h1>
+                            <h1 className="text-gray-700 text-2xl hover:text-black transition duration-300">Features</h1>
+                            <h1 className="text-gray-700 text-2xl hover:text-black transition duration-300">Contact</h1>
+                        </div>
+
+                        <div className="flex items-center absolute right-0 inset-y-0 gap-3">
+                            <img className="h-13 w-13 rounded-full" src="/notification.png" alt="Notification" />
+                            <img className="h-13 w-13 rounded-full" src="/profile.png" alt="Profile" />
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
             <div>
                 <h1 className="font-bold text-3xl pt-4 pl-4">
                     Welcome to the Trazia App!
