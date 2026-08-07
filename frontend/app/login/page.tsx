@@ -102,10 +102,13 @@ export default function Login() {
             </nav>
 
             <div>
-                <h1 className="font-bold text-3xl pt-4 pl-4">
-                    Welcome to the Trazia App!
+                <h1 className="font-semibold text-3xl pt-4 pl-4">
+                    Stay organized.
                 </h1>
-                <h2 className="pl-4"> Please log in or sign up. </h2>
+                <h1 className="font-semibold text-3xl pt-1 pl-4">
+                    Stay ahead.
+                </h1>
+                <h2 className="pl-4 pt-2"> Please log in or sign up for an account. </h2>
             </div>
 
             <div>
