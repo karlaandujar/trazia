@@ -19,6 +19,12 @@
   }
 }
 
+.hero-bg {
+  background-image: url('/trazia_hero_bg.png');
+  background-size: cover;
+  background-position: center;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
