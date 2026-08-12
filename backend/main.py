@@ -27,6 +27,11 @@ def get_current_user(request: Request):
     clean_token = token[7:]
     return get_user(clean_token).user.id
 
+# Endpoint for backend
+@app.get("/")
+def root():
+    return {"message": "Trazia backend is running."}
+
 # Endpoint for reading assignments
 @app.get("/assignments")
 def read_assignments(request: Request):

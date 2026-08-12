@@ -43,7 +43,7 @@ export default function Dashboard() {
         formData.append("file", file);
         formData.append("course_id", selectedCourse);
         // POST method to send the file to the backend
-        const response = await fetch("http://127.0.0.1:8000/upload/", {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/`, {
             method: "POST",
             headers: {
                 "Authorization": "Bearer " + token
@@ -56,7 +56,7 @@ export default function Dashboard() {
     // Handle adding a new course
     async function handleAddCourse() {
         const token = session?.access_token;
-        const response = await fetch("http://127.0.0.1:8000/courses", {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/courses`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -108,13 +108,13 @@ export default function Dashboard() {
             setSession(data.session);
             const token = data.session.access_token
             
-            fetch("http://127.0.0.1:8000/courses", { headers: {"Authorization": "Bearer " + token}})
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/courses`, { headers: {"Authorization": "Bearer " + token}})
             .then((response) => response.json())
             .then((data) => {
                 setCourses(data);
             });
 
-            fetch("http://127.0.0.1:8000/assignments", { headers: {"Authorization": "Bearer " + token}})
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/assignments`, { headers: {"Authorization": "Bearer " + token}})
             .then((response) => response.json())
             .then((data) => {
                 setAssignments(data);
