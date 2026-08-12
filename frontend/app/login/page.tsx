@@ -104,7 +104,7 @@ export default function Login() {
                 </nav>
 
                 {/* Hero Section */}
-                <div className="flex justify-between gap-1 px-16 py-12 grid grid-cols-2 bg-[url('/trazia_hero_bg.png')] bg-position-[65%_20%] border-b border-slate-300">
+                <div className="flex justify-between gap-1 mx-2 px-16 py-12 grid grid-cols-2 bg-[url('/trazia_hero_bg.png')] bg-cover bg-position-[65%_20%] border-b border-slate-300">
 
                     {/* Left column */}
                     <div className="col-start-1">
@@ -237,9 +237,9 @@ export default function Login() {
 
 
                 {/* Section below hero and login/signup cards */}
-                <div className="pb-7">
+                <div className="pb-7 flex flex-col">
                     <h3 className="text-2xl font-bold text-slate-800 mb-2 p-5">Why Choose Trazia</h3>
-                    <div className="flex justify-between px-5">
+                    <div className="flex-1 flex items-center justify-between px-5">
                         {/* Feature 1: Save Time */}
                             <div className="flex items-center">
                                 <div className="flex size-18 items-center justify-center rounded-md bg-[#E5F3FD]">
