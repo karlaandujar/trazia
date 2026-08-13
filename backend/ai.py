@@ -28,13 +28,14 @@ def get_assignments_from_sched(text):
                 "type": "Exam", 
                 "due_date": "2026-10-15", 
                 "points": 100, 
-                "weight": 0.50
+                "weight": 0.50,
+                "subject": CS
                 }}
             ] 
         }}
 
-        It is okay to leave what is not stated as a null or default value. Do not wrap the response in Markdown code fences. Do not include explanations or commentary. Only
-        use the type values of "Homework", "Assignment", "Quiz", "Exam", "Pre-Lab", "Post-Lab", "Discussion", and "Participation" {sched}""".format(sched=text)
+        It is okay to leave what is not stated as a null or default value. Do not wrap the response in Markdown code fences. Do not include explanations or commentary. Infer 1-3 characters for the subject using the course number; 
+        for example if the course is PHYS 1101, the subject would be 'PH' or the subject for math would be 'MA'. Use the type values like "Homework", "Assignment", "Quiz", "Exam", "Pre-Lab", "Post-Lab", "Discussion", and "Participation" {sched}""".format(sched=text)
     )
     # Convert the JSON into a dictionary and return
     try:

@@ -10,6 +10,7 @@ export default function Dashboard() {
         id: number;
         course_number: string;
         course_name: string;
+        subject: string;
     };
 
     type Assignment = {
@@ -25,6 +26,7 @@ export default function Dashboard() {
     const [assignments, setAssignments] = useState<Assignment[]>([]);
     const [courseName, setCourseName] = useState("");
     const [courseNumber, setCourseNumber] = useState("");
+    const [courseSubject, setCourseSubject] = useState("");
     const [file, setFile] = useState<File | null>(null);
     const [selectedCourse, setSelectedCourse] = useState("");
     const [session, setSession] = useState<Session | null>(null);
@@ -65,6 +67,7 @@ export default function Dashboard() {
             body: JSON.stringify({
                 course_name: courseName,
                 course_number: courseNumber,
+                subject: courseSubject
             }),
         });
         // Ensure no errors in adding the course
@@ -83,6 +86,7 @@ export default function Dashboard() {
         // Clear inputs
         setCourseName("");
         setCourseNumber("");
+        setCourseSubject("");
         // Refresh table
         window.location.reload();
     }
@@ -143,20 +147,21 @@ export default function Dashboard() {
                             </div>
 
                             <div className="flex items-center absolute left-1/2 -translate-x-1/2 inset-y-0 gap-10">
-                                <h1 className="text-gray-700 text-2xl hover:text-black transition duration-300">About</h1>
-                                <h1 className="text-gray-700 text-2xl hover:text-black transition duration-300">Features</h1>
-                                <h1 className="text-gray-700 text-2xl hover:text-black transition duration-300">Contact</h1>
+                                <h1 className="text-gray-700 text-2xl hover:text-black transition duration-300 cursor-pointer">Dashboard</h1>
+                                <h1 className="text-gray-700 text-2xl hover:text-black transition duration-300 cursor-pointer">Courses</h1>
+                                <h1 className="text-gray-700 text-2xl hover:text-black transition duration-300 cursor-pointer">Assignments</h1>
+                                <h1 className="text-gray-700 text-2xl hover:text-black transition duration-300 cursor-pointer">Calendar</h1>
                             </div>
 
                             <div className="flex items-center absolute right-0 inset-y-0 gap-3">
-                                <img className="h-13 w-13 rounded-full" src="/notification.png" alt="Notification" />
-                                <img className="h-13 w-13 rounded-full" src="/profile.png" alt="Profile" />
+                                <img className="h-13 w-13 rounded-full cursor-pointer" src="/notification.png" alt="Notification" />
+                                <img className="h-13 w-13 rounded-full cursor-pointer" src="/profile.png" alt="Profile" />
                             </div>
                         </div>
                     </div>
                 </nav>
 
-                <div className="flex justify-between gap-1 mx-2 px-16 py-12 grid grid-rows-4 bg-[url('/trazia_hero_bg.png')] bg-cover bg-position-[2%_20%]">
+                <div className="flex gap-1 mx-2 px-16 pt-12 flex flex-col gap-8 bg-[url('/trazia_hero_bg.png')] bg-cover bg-position-[2%_20%]">
                     {/* Headers */}
                     <div className="pt-8">
                         <h1 className="font-semibold text-3xl text-slate-800">Welcome</h1>
@@ -212,7 +217,7 @@ export default function Dashboard() {
                             </div>
                         </div>
                         { /* Next up */ }
-                        <div className="bg-[#f7f9fa] rounded-xl min-w-[calc(100%-45rem)] min-h-[13rem] shadow-md">
+                        <div className="bg-[#f7f9fa] rounded-xl min-w-[calc(35%)] min-h-[13rem] shadow-md">
                             <div className="flex pt-5 pl-4">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 mr-2 text-[#5775d6]">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
@@ -232,91 +237,88 @@ export default function Dashboard() {
                                 <p className="text-slate-700 text-sm pl-2">Due in _ days, DueDateHere</p>
                             </div>
 
-                            <button className="border border-slate-300 min-w-[calc(100%-2rem)] text-[#5775d6] font-semibold mb-3 mt-7 py-2 px-4 rounded-lg hover:bg-[#e3eaff] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 ml-4">
-                                View assignment <span className="text-lg">➜</span>
+                            <button className="cursor-pointer flex border border-slate-300 min-w-[calc(100%-2rem)] text-[#5775d6] font-semibold mb-3 mt-7 pl-[calc(30%)] py-2 px-4 rounded-lg hover:bg-[#e3eaff] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 ml-4">
+                                View assignment 
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-7 pl-1">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
+                                </svg>
                             </button>
+
                         </div>
                     </div>
-
 
                     <div>
-                        <h1 className="font-bold text-xl pt-10 pl-4">Courses</h1>
-                        <div>
-
-                            <select className="border p-2 ml-4" value={selectedCourse} onChange={(e) => setSelectedCourse(e.target.value)}>
-                                <option value="">Select a course</option>
-                                {courses.map((course) => (
-                                    <option key={course.id} value={course.id}>
-                                        {course.course_number} - {course.course_name}
-                                    </option>
-                                ))}
-                            </select>
-
-                            <input className="border ml-4 p-2 mt-2 hover:bg-gray-200" type="file" onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)} />
-                            <button className="p-2 ml-2 rounded hover:bg-blue-200 border" onClick={handleFileUpload}>Upload Course Schedule</button>
+                        {/* Course section headers */}
+                        <div className="flex justify-between relative">
+                            <h1 className="font-bold text-xl pt-10 pl-4 pb-4">My Courses</h1>
+                            <button className="font-semibold text-md pt-10 text-[#5775d6] absolute right-0 flex cursor-pointer" onClick={() => router.push("/courses")}>
+                                View all courses
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-7 pl-1">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
+                                </svg>
+                            </button>
                         </div>
                         
-                        <div className="mt-3">
-                            <input className="border ml-4 p-2" maxLength={10} placeholder="Enter course number" value={courseNumber} onChange={(e) => setCourseNumber(e.target.value.toUpperCase().replace(/[^A-Z0-9 ]/g, ""))} />
-                            <input className="border ml-1 p-2" placeholder="Enter course name" value={courseName} onChange={(e) => setCourseName(e.target.value)} />
-                            <button className="p-2 ml-3 rounded hover:bg-blue-200 border" onClick={handleAddCourse}>Add Course</button>
-                        </div>
-                    </div>
-
-                    <div className="pt-10">
-                        <h1 className="font-bold text-xl pt-4 pl-4">My courses</h1>
-
-                        <div className="flex justify-start">
-                            <table className="border-collapse border border-gray-400 ml-4">
-                            <thead>
-                                <tr>
-                                <th className="border border-gray-400 px-4 py-1">Course Number</th>
-                                <th className="border border-gray-400 px-4 py-1">Course Name</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {courses.map((course) => (
-                                <tr key={course.id}>
-                                    <td className="border border-gray-400 px-4 py-1">{course.course_number}</td>
-                                    <td className="border border-gray-400 px-4 py-1">{course.course_name}</td>
-                                </tr>
-                                ))}
-                            </tbody>
-                            </table>
+                        {/* Individual course cards */}
+                        <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {courses.map((course) => (
+                            <div key={course.id} className="items-center justify-center bg-white rounded-xl shadow-md p-4 min-h-45">
+                                <div className="flex">
+                                    <div className="flex size-15 items-center justify-center rounded-lg bg-[#DCEBF5] mr-5">
+                                        <p className="font-semibold text-2xl text-slate-600">{course.subject}</p>
+                                    </div>
+                                    <div>
+                                        <p className='font-semibold text-slate-800 text-xl'>{course.course_number}</p>
+                                        <p className='text-slate-600'>{course.course_name}</p>
+                                    </div>
+                                </div>
+                                
+                                <p className='text-sm pt-4'>progress bar, assignment count, view course button, three dots (modify course) coming soon...</p>
+                            </div>
+                            ))}
                         </div>
                     </div>
 
 
-                    <div className="pt-10">
-                        <h1 className="font-bold text-xl pt-4 pl-4">My assignments</h1>
+                    <div className="pt-10 flex gap-5">
+                        {/* Upcoming assignments table */}
+                        <div className="bg-white rounded-xl shadow-md p-4 min-w-[50%]">
+                            <h1 className="font-semibold text-xl pb-4">Upcoming Assignments</h1>
 
-                        <div className="flex justify-start">
-                            <table className="border-collapse border border-gray-400 ml-4">
-                            <thead>
-                                <tr>
-                                <th className="border border-gray-400 px-4 py-1">Title</th>
-                                <th className="border border-gray-400 px-4 py-1">Type</th>
-                                <th className="border border-gray-400 px-4 py-1">Due Date</th>
-                                <th className="border border-gray-400 px-4 py-1">Points</th>
-                                <th className="border border-gray-400 px-4 py-1">Weight</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+                            <table className="justify-between">
+                                <thead>
+                                    <tr>
+                                        <th className="border-b border-gray-300 px-5 py-1 font-semibold text-slate-700">Assignment</th>
+                                        <th className="border-b border-gray-300 px-4 py-1 font-semibold text-slate-700">Course</th>
+                                        <th className="border-b border-gray-300 px-4 py-1 font-semibold text-slate-700">Due Date</th>
+                                        <th className="border-b border-gray-300 px-4 py-1 font-semibold text-slate-700">Points</th>
+                                        <th className="border-b border-gray-300 px-4 py-1 font-semibold text-slate-700">Progress</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
                                 {assignments.map((assignment) => (
                                     <tr key={assignment.id}>
-                                        <td className="border border-gray-400 px-4 py-1">{assignment.title}</td>
-                                        <td className="border border-gray-400 px-4 py-1">{assignment.type}</td>
-                                        <td className="border border-gray-400 px-4 py-1">{assignment.due_date}</td>
-                                        <td className="border border-gray-400 px-4 py-1">{assignment.points}</td>
-                                        <td className="border border-gray-400 px-4 py-1">{assignment.weight}</td>
+                                        <td className="border-b border-gray-300 px-5 py-1 font-semibold text-slate-700">{assignment.title}</td>
+                                        <td className="border-b border-gray-300 px-4 py-1 text-slate-700">      </td>
+                                        <td className="border-b border-gray-300 px-4 py-1 text-slate-700">{assignment.due_date}</td>
+                                        <td className="border-b border-gray-300 px-4 py-1 text-slate-700">{assignment.points}</td>
+                                        <td className="border-b border-gray-300 px-4 py-1 text-slate-700">    </td>
                                     </tr>
                                 ))}
                             </tbody>
                             </table>
                         </div>
+                        
+                        {/* Exams table */}
+                        <div className="bg-white rounded-xl shadow-md p-4 min-w-[30%]">
+                            <h1 className="font-semibold text-xl pb-4">Next Exams</h1>
+                            <p> Exams will go here... </p>
+                        </div>
+
+
                     </div>
-                    <div className="pt-10">
-                        <button className="p-2 ml-3 rounded hover:bg-blue-200 border" onClick={handleLogOut}>Log Out</button>
+                    <div className="pt-10 pb-3">
+                        <button className="bg-white p-2 ml-3 rounded hover:bg-blue-200 border cursor-pointer" onClick={handleLogOut}>Log Out</button>
                     </div>
                 </div>
             </div>

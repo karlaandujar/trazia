@@ -90,14 +90,14 @@ export default function Login() {
                             </div>
 
                             <div className="flex items-center absolute left-1/2 -translate-x-1/2 inset-y-0 gap-10">
-                                <h1 className="text-gray-700 text-2xl hover:text-black transition duration-300">About</h1>
-                                <h1 className="text-gray-700 text-2xl hover:text-black transition duration-300">Features</h1>
-                                <h1 className="text-gray-700 text-2xl hover:text-black transition duration-300">Contact</h1>
+                                <h1 className="text-gray-700 text-2xl hover:text-black transition duration-300 cursor-pointer">About</h1>
+                                <h1 className="text-gray-700 text-2xl hover:text-black transition duration-300 cursor-pointer">Features</h1>
+                                <h1 className="text-gray-700 text-2xl hover:text-black transition duration-300 cursor-pointer">Contact</h1>
                             </div>
 
                             <div className="flex items-center absolute right-0 inset-y-0 gap-3">
-                                <img className="h-13 w-13 rounded-full" src="/notification.png" alt="Notification" />
-                                <img className="h-13 w-13 rounded-full" src="/profile.png" alt="Profile" />
+                                <img className="h-13 w-13 rounded-full cursor-pointer" src="/notification.png" alt="Notification" />
+                                <img className="h-13 w-13 rounded-full cursor-pointer" src="/profile.png" alt="Profile" />
                             </div>
                         </div>
                     </div>
@@ -186,7 +186,7 @@ export default function Login() {
 
                                     </div>
                             </div>
-                            <button className="p-2 ml-2 mt-7 w-[calc(100%-1rem)] rounded-2xl bg-[#8AB3D6] text-white font-semibold hover:bg-slate-400 border shadow-sm" onClick={handleLogin}>Log In</button>
+                            <button className="p-2 ml-2 mt-7 w-[calc(100%-1rem)] rounded-2xl bg-[#8AB3D6] text-white cursor-pointer font-semibold hover:bg-slate-400 border shadow-sm" onClick={handleLogin}>Log In</button>
                         
                             <p className="text-center text-gray-600 pt-2">Don't have an account? <span className="text-blue-500 hover:text-blue-700 cursor-pointer" onClick={() => setShowAccCreate(true)}>Create one</span></p>
                         </div>
@@ -227,7 +227,7 @@ export default function Login() {
                                     </svg>
                                 </div>
                             </div>
-                            <button className="p-2 ml-2 mt-7 w-[calc(100%-1rem)] rounded-2xl bg-[#8AB3D6] text-white font-semibold hover:bg-slate-400 border shadow-sm" onClick={handleSignUp}>Sign Up</button>
+                            <button className="p-2 ml-2 mt-7 w-[calc(100%-1rem)] rounded-2xl bg-[#8AB3D6] text-white cursor-pointer font-semibold hover:bg-slate-400 border shadow-sm" onClick={handleSignUp}>Sign Up</button>
 
                             <p className="text-center text-gray-600 pt-2">Already have an account? <span className="text-blue-500 hover:text-blue-700 cursor-pointer" onClick={() => setShowAccCreate(false)}>Log in</span></p>
                         </div>
