@@ -34,9 +34,9 @@ def root():
 
 # Endpoint for reading assignments
 @app.get("/assignments")
-def read_assignments(request: Request):
+def read_assignments(request: Request, assignment_type: str | None = None):
     user_id = get_current_user(request)
-    return get_assignments(user_id)
+    return get_assignments(user_id, assignment_type)
 
 # Endpoint for reading courses
 @app.get("/courses")

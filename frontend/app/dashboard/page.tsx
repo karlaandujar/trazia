@@ -22,74 +22,22 @@ export default function Dashboard() {
         weight: number;
     };
 
+    type Exam = {
+        id: number;
+        title: string;
+        type: string;
+        due_date: string;
+        points: number;
+        weight: number;
+    };
+
     const [courses, setCourses] = useState<Course[]>([]);
     const [assignments, setAssignments] = useState<Assignment[]>([]);
-    const [courseName, setCourseName] = useState("");
-    const [courseNumber, setCourseNumber] = useState("");
-    const [courseSubject, setCourseSubject] = useState("");
-    const [file, setFile] = useState<File | null>(null);
-    const [selectedCourse, setSelectedCourse] = useState("");
+    const [exams, setExams] = useState<Exam[]>([]);
     const [session, setSession] = useState<Session | null>(null);
     const router = useRouter();
 
     
-    // Function that handles PDF uploads for course additions
-    async function handleFileUpload() {
-        if (!file) {
-            alert("Please select a file to upload.");
-            return;
-        }
-        // Get user token and create form with necessary data
-        const token = session?.access_token;
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("course_id", selectedCourse);
-        // POST method to send the file to the backend
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/`, {
-            method: "POST",
-            headers: {
-                "Authorization": "Bearer " + token
-            },
-            body: formData
-        });
-    }
-
-
-    // Handle adding a new course
-    async function handleAddCourse() {
-        const token = session?.access_token;
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/courses`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + token
-            },
-            body: JSON.stringify({
-                course_name: courseName,
-                course_number: courseNumber,
-                subject: courseSubject
-            }),
-        });
-        // Ensure no errors in adding the course
-        const data = await response.json();
-        if (!response.ok) {
-            console.error("Error adding course:", data);
-            return;
-        }
-        // Clean the data
-        if (!courseNumber.trim() || !courseName.trim()) {
-            alert("Please fill in both course number and course name.");
-            return;
-        }
-        // Log that the course was added
-        console.log("Course added:", data);
-        // Clear inputs
-        setCourseName("");
-        setCourseNumber("");
-        setCourseSubject("");
-        // Refresh table
-        window.location.reload();
-    }
 
     // Function to log out a user when button is clicked
     async function handleLogOut() {
@@ -99,6 +47,15 @@ export default function Dashboard() {
         } else {
             router.push("/login"); // Send them back to the login screen
         }
+    }
+
+    // Function to format the date nicer
+    function formatDate(date: string) {
+        return new Date(date).toLocaleDateString("en-US", {
+            weekday: "long",
+            month: "short",
+            day: "numeric"
+        });
     }
 
     // Loads the data like session and user
@@ -112,16 +69,27 @@ export default function Dashboard() {
             setSession(data.session);
             const token = data.session.access_token
             
+            // Fetch user courses
             fetch(`${process.env.NEXT_PUBLIC_API_URL}/courses`, { headers: {"Authorization": "Bearer " + token}})
             .then((response) => response.json())
             .then((data) => {
                 setCourses(data);
             });
 
-            fetch(`${process.env.NEXT_PUBLIC_API_URL}/assignments`, { headers: {"Authorization": "Bearer " + token}})
+            // Fetch user assignments except for exams
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/assignments?assignment_type=regular`, { headers: {"Authorization": "Bearer " + token}})
             .then((response) => response.json())
             .then((data) => {
                 setAssignments(data);
+                console.log(data);
+                console.log(Array.isArray(data));
+            });
+
+            // Fetch user exams
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/assignments?assignment_type=exam`, { headers: {"Authorization": "Bearer " + token}})
+            .then((response) => response.json())
+            .then((data) => {
+                setExams(data);
                 console.log(data);
                 console.log(Array.isArray(data));
             });
@@ -210,7 +178,7 @@ export default function Dashboard() {
                                 </div>
 
                                 <div>
-                                    <p className="text-2xl font-bold">0</p>
+                                    <p className="text-2xl font-bold">{exams.length}</p>
                                     <p className="text-slate-700 font-semibold">Exams</p>
                                     <p className="text-slate-500">This week</p>
                                 </div>
@@ -285,7 +253,7 @@ export default function Dashboard() {
                         <div className="bg-white rounded-xl shadow-md p-4 min-w-[50%]">
                             <h1 className="font-semibold text-xl pb-4">Upcoming Assignments</h1>
 
-                            <table className="justify-between">
+                            <table className="justify-between w-[100%]">
                                 <thead>
                                     <tr>
                                         <th className="border-b border-gray-300 px-5 py-1 font-semibold text-slate-700">Assignment</th>
@@ -295,12 +263,12 @@ export default function Dashboard() {
                                         <th className="border-b border-gray-300 px-4 py-1 font-semibold text-slate-700">Progress</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className="text-center">
                                 {assignments.map((assignment) => (
                                     <tr key={assignment.id}>
                                         <td className="border-b border-gray-300 px-5 py-1 font-semibold text-slate-700">{assignment.title}</td>
                                         <td className="border-b border-gray-300 px-4 py-1 text-slate-700">      </td>
-                                        <td className="border-b border-gray-300 px-4 py-1 text-slate-700">{assignment.due_date}</td>
+                                        <td className="border-b border-gray-300 px-4 py-1 text-slate-700">{formatDate(assignment.due_date)}</td>
                                         <td className="border-b border-gray-300 px-4 py-1 text-slate-700">{assignment.points}</td>
                                         <td className="border-b border-gray-300 px-4 py-1 text-slate-700">    </td>
                                     </tr>
@@ -312,7 +280,25 @@ export default function Dashboard() {
                         {/* Exams table */}
                         <div className="bg-white rounded-xl shadow-md p-4 min-w-[30%]">
                             <h1 className="font-semibold text-xl pb-4">Next Exams</h1>
-                            <p> Exams will go here... </p>
+                            <table className="justify-between w-[100%]">
+                                <thead>
+                                    <tr>
+                                        <th className="border-b border-gray-300 px-5 py-1 font-semibold text-slate-700">Date</th>
+                                        <th className="border-b border-gray-300 px-5 py-1 font-semibold text-slate-700">Course</th>
+                                        <th className="border-b border-gray-300 px-5 py-1 font-semibold text-slate-700">Exam</th>
+                                    </tr>
+                                </thead>
+                                
+                                <tbody className="text-center">
+                                    {exams.map((exam) => (
+                                        <tr key={exam.id}>
+                                            <td className="border-b border-gray-300 px-4 py-3 text-slate-700">{formatDate(exam.due_date)}</td>
+                                            <td className="border-b border-gray-300 px-4 py-3 text-slate-700">     </td>
+                                            <td className="border-b border-gray-300 px-4 py-3 text-slate-700">{exam.title}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
 
 
