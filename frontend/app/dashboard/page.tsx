@@ -85,7 +85,7 @@ export default function Dashboard() {
                 console.log(Array.isArray(data));
             });
 
-            // Fetch user exams
+            // Fetch only user exams
             fetch(`${process.env.NEXT_PUBLIC_API_URL}/assignments?assignment_type=exam`, { headers: {"Authorization": "Bearer " + token}})
             .then((response) => response.json())
             .then((data) => {
