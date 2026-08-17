@@ -1,6 +1,7 @@
 import os
 from supabase import create_client, Client
 from dotenv import load_dotenv
+from datetime import datetime, date, timedelta
 
 
 # Load environment variables from .env file
@@ -14,6 +15,19 @@ supabase: Client = create_client(url, key)
 def get_user(token):
     return supabase.auth.get_user(token)
 
+# Gets the users current day and time
+def get_current_datetime():
+    return datetime.now()
+
+# Gets the users current school week
+def get_current_week():
+    today = date.today()
+    start = today - timedelta(days=today.weekday())
+    end = start + timedelta(days=6)
+
+    return start, end
+
+# Returns the assignments for the user based on the query parameter
 def get_assignments(user_id, assignment_type):
     # Get the user's courses and put them into a list of course ids
     courses = get_courses(user_id)
@@ -24,6 +38,9 @@ def get_assignments(user_id, assignment_type):
         response = supabase.table("assignments").select("*").in_("course_id", course_ids).eq("type", "Exam").execute()
     elif (assignment_type == "regular"):
         response = supabase.table("assignments").select("*").in_("course_id", course_ids).neq("type", "Exam").execute()
+    elif (assignment_type == "current_week"):
+        start, end = get_current_week()
+        response = supabase.table("assignments").select("*").in_("course_id", course_ids).gte("due_date", start).lte("due_date", end).execute()
     else:
         response = supabase.table("assignments").select("*").in_("course_id", course_ids).execute()
     

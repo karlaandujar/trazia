@@ -52,7 +52,7 @@ export default function Dashboard() {
     // Function to format the date nicer
     function formatDate(date: string) {
         return new Date(date).toLocaleDateString("en-US", {
-            weekday: "long",
+            weekday: "short",
             month: "short",
             day: "numeric"
         });
@@ -76,8 +76,8 @@ export default function Dashboard() {
                 setCourses(data);
             });
 
-            // Fetch user assignments except for exams
-            fetch(`${process.env.NEXT_PUBLIC_API_URL}/assignments?assignment_type=regular`, { headers: {"Authorization": "Bearer " + token}})
+            // Fetch user assignments this week except for exams
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/assignments?assignment_type=current_week`, { headers: {"Authorization": "Bearer " + token}})
             .then((response) => response.json())
             .then((data) => {
                 setAssignments(data);
