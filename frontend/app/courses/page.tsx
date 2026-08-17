@@ -3,6 +3,7 @@ import supabase from "@/lib/supabase";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Session } from "@supabase/supabase-js";
+import { getNav } from "../dashboard/page";
 
 export default function Courses() {
     type Course = {
@@ -105,33 +106,13 @@ export default function Courses() {
     }
 
     return(
-        <div className="px-2 py-2">
+        /* Overlay on entire div if the card is open */
+        <div className={`px-2 py-2 ${showAddCourse ? 'before:absolute before:inset-0 before:z-50 before:bg-black/30' : '' }`}>
             <div className="bg-white rounded-3xl shadow-sm overflow-hidden min-h-[calc(100vh-1rem)] max-w-[calc(100vw-1rem)]">
                 {/* Navigation bar */}
-                <nav className="bg-white text-white sticky top-0 z-50 border-b-4 border-gray-100 justify-between">
-                    <div className="mx-auto px-6">
-                        <div className="relative flex justify-between align-items-center h-20">
+                { getNav() }
 
-                            <div className="flex items-center absolute left-0 inset-y-0">
-                                <h1 className="text-4xl font-semibold tracking-widest text-gray-900">Trazia</h1>
-                            </div>
-
-                            <div className="flex items-center absolute left-1/2 -translate-x-1/2 inset-y-0 gap-10">
-                                <h1 className="text-gray-700 text-2xl hover:text-black transition duration-300 cursor-pointer">Dashboard</h1>
-                                <h1 className="text-gray-700 text-2xl hover:text-black transition duration-300 cursor-pointer">Courses</h1>
-                                <h1 className="text-gray-700 text-2xl hover:text-black transition duration-300 cursor-pointer">Assignments</h1>
-                                <h1 className="text-gray-700 text-2xl hover:text-black transition duration-300 cursor-pointer">Calendar</h1>
-                            </div>
-
-                            <div className="flex items-center absolute right-0 inset-y-0 gap-3">
-                                <img className="h-13 w-13 rounded-full cursor-pointer" src="/notification.png" alt="Notification" />
-                                <img className="h-13 w-13 rounded-full cursor-pointer" src="/profile.png" alt="Profile" />
-                            </div>
-                        </div>
-                    </div>
-                </nav>
-
-                <div className="flex gap-1 mx-2 px-16 pt-12 flex flex-col gap-8 bg-[url('/trazia_hero_bg.png')] bg-cover bg-position-[2%_20%]">
+                <div className="flex gap-1 mx-2 px-16 pt-12 flex flex-col gap-8 bg-[url('/trazia_hero_bg.png')] min-h-[calc(100vh-7rem)] rounded-3xl bg-cover bg-position-[2%_20%]">
                     {/* Headers and course addition button */}
                     <div className="flex relative pt-6">
                         <div>
@@ -148,8 +129,8 @@ export default function Courses() {
                     </div>
 
                     {/* Add course card - only shows if button was clicked */}
-                    {showAddCourse && <div className="bg-slate-200 absolute inset-30 bottom-50 top-50 z-10 p-4">
-                        <p>ADD COURSE CARD</p>
+                    {showAddCourse && <div className="bg-slate-200 absolute inset-30 bottom-50 top-50 z-60 p-4">
+                        <p>course card styling coming later...</p>
                         <button className="bg-blue-200 cursor-pointer" onClick={() => setShowAddCourse(false)}>X</button>
 
                         {/* File uploads */}

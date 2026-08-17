@@ -1,6 +1,6 @@
 "use client";
 import supabase from "@/lib/supabase";
-import { useState, useEffect } from "react";
+import { useState, useEffect, JSX } from "react";
 import { useRouter } from "next/navigation";
 import { Session } from "@supabase/supabase-js";
 
@@ -37,6 +37,7 @@ export default function Dashboard() {
     const [session, setSession] = useState<Session | null>(null);
     const router = useRouter();
 
+    
     
 
     // Function to log out a user when button is clicked
@@ -104,32 +105,11 @@ export default function Dashboard() {
 
     return (
         <div className="px-2 py-2">
-            <div className="bg-white rounded-3xl shadow-sm overflow-hidden min-h-[calc(100vh-1rem)] max-w-[calc(100vw-1rem)]">
+            <div className="bg-white pb-2 rounded-3xl shadow-sm overflow-hidden min-h-[calc(100vh-1rem)] max-w-[calc(100vw-1rem)]">
                 {/* Navigation bar */}
-                <nav className="bg-white text-white sticky top-0 z-50 border-b-4 border-gray-100 justify-between">
-                    <div className="mx-auto px-6">
-                        <div className="relative flex justify-between align-items-center h-20">
+                { getNav() }
 
-                            <div className="flex items-center absolute left-0 inset-y-0">
-                                <h1 className="text-4xl font-semibold tracking-widest text-gray-900">Trazia</h1>
-                            </div>
-
-                            <div className="flex items-center absolute left-1/2 -translate-x-1/2 inset-y-0 gap-10">
-                                <h1 className="text-gray-700 text-2xl hover:text-black transition duration-300 cursor-pointer">Dashboard</h1>
-                                <h1 className="text-gray-700 text-2xl hover:text-black transition duration-300 cursor-pointer">Courses</h1>
-                                <h1 className="text-gray-700 text-2xl hover:text-black transition duration-300 cursor-pointer">Assignments</h1>
-                                <h1 className="text-gray-700 text-2xl hover:text-black transition duration-300 cursor-pointer">Calendar</h1>
-                            </div>
-
-                            <div className="flex items-center absolute right-0 inset-y-0 gap-3">
-                                <img className="h-13 w-13 rounded-full cursor-pointer" src="/notification.png" alt="Notification" />
-                                <img className="h-13 w-13 rounded-full cursor-pointer" src="/profile.png" alt="Profile" />
-                            </div>
-                        </div>
-                    </div>
-                </nav>
-
-                <div className="flex gap-1 mx-2 px-16 pt-12 flex flex-col gap-8 bg-[url('/trazia_hero_bg.png')] bg-cover bg-position-[2%_20%]">
+                <div className="flex gap-1 mx-2 px-16 pt-12 flex flex-col gap-8 bg-[url('/trazia_hero_bg.png')] rounded-3xl bg-cover bg-position-[2%_20%]">
                     {/* Headers */}
                     <div className="pt-8">
                         <h1 className="font-semibold text-3xl text-slate-800">Welcome</h1>
@@ -251,7 +231,15 @@ export default function Dashboard() {
                     <div className="pt-10 flex gap-5">
                         {/* Upcoming assignments table */}
                         <div className="bg-white rounded-xl shadow-md p-4 min-w-[50%]">
-                            <h1 className="font-semibold text-xl pb-4">Upcoming Assignments</h1>
+                            <div className="relative justify-between">
+                                <h1 className="font-semibold text-xl pb-4">Upcoming Assignments</h1>
+                                <button className="font-semibold text-md pt-10 text-[#5775d6] absolute right-0 -top-9 flex cursor-pointer" onClick={() => router.push("/assignments")}>
+                                    View all assignments
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-7 pl-1">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
+                                    </svg>
+                                </button>
+                            </div>
 
                             <table className="justify-between w-[100%]">
                                 <thead>
@@ -311,3 +299,33 @@ export default function Dashboard() {
         </div>
     )
 }
+
+// Returns the nav bar (used on other pages)
+    export const getNav = (): JSX.Element => {
+        const router = useRouter();
+        return (
+            <nav className="bg-white text-white sticky top-0 z-30 border-b-4 border-gray-100 justify-between">
+                    <div className="mx-auto px-6">
+                        <div className="relative flex justify-between align-items-center h-20">
+
+                            <div className="flex items-center absolute left-0 inset-y-0">
+                                <h1 className="text-4xl font-semibold tracking-widest text-gray-900">Trazia</h1>
+                            </div>
+
+                            <div className="flex items-center absolute left-1/2 -translate-x-1/2 inset-y-0 gap-10">
+                                <h1 className="text-gray-700 text-2xl hover:text-black transition duration-300 cursor-pointer" onClick={() => router.push("/dashboard")}>Dashboard</h1>
+                                <h1 className="text-gray-700 text-2xl hover:text-black transition duration-300 cursor-pointer" onClick={() => router.push("/courses")}>Courses</h1>
+                                <h1 className="text-gray-700 text-2xl hover:text-black transition duration-300 cursor-pointer" onClick={() => router.push("/assignments")}>Assignments</h1>
+                                <h1 className="text-gray-700 text-2xl hover:text-black transition duration-300 cursor-pointer">Calendar</h1>
+                            </div>
+
+                            <div className="flex items-center absolute right-0 inset-y-0 gap-3">
+                                <img className="h-13 w-13 rounded-full cursor-pointer" src="/notification.png" alt="Notification" />
+                                <img className="h-13 w-13 rounded-full cursor-pointer" src="/profile.png" alt="Profile" />
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+        )
+    };
+    
