@@ -77,10 +77,33 @@ export default function Assignments() {
         });
     }
 
+    // Helper function to load assignments table upon assignment addition
+    async function loadAssignments() {
+        const token = session?.access_token;
+
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/assignments`, {
+            headers: {
+                "Authorization": "Bearer " + token
+            }
+        });
+
+        const data = await response.json();
+        setAssignments(data);
+    }
+
     // Variable to receive the submission of assignment addition form event and add it
-    const handleAddAssignment = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleAddAssignment = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        addAssignment()
+        await addAssignment();
+        // After the assignment is added, clear inputs, remove the card from the screen and reload the table
+        setSelectedCourse("");
+        setAssignmentTitle("");
+        setAssignmentType("");
+        setAssignmentDueDate(null);
+        setAssignmentPoints(null);
+        setAssignmentWeight(null);
+        setShowAddAssignment(false);
+        loadAssignments();
     }
 
     // Function to actually add an assignment
