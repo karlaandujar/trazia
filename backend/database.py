@@ -46,6 +46,10 @@ def get_assignments(user_id, assignment_type):
     
     return response.data
 
+# Adds an assignment to the assignment table
+def create_assignment(title, type, due_date, points, weight, course_id):
+    return;
+
 def get_courses(user_id):
     response = supabase.table("courses").select("*").eq("user_id", user_id).execute()
     courses = response.data

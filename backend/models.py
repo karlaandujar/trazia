@@ -1,7 +1,16 @@
 from pydantic import BaseModel
+from uuid import UUID
 
 
 class CourseCreate(BaseModel):
     course_name: str
     course_number: str
     subject: str
+
+class AssignmentCreate(BaseModel):
+    title: str
+    type: str
+    due_date: str
+    points: int
+    weight: int | None = None
+    course_id: UUID

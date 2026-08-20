@@ -3,7 +3,7 @@ from fastapi import FastAPI, UploadFile, Form, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pypdf import PdfReader
 from database import get_courses, create_course, get_course_by_id, get_user, upload_assignments, get_assignments
-from models import CourseCreate
+from models import CourseCreate, AssignmentCreate
 from ai import get_assignments_from_sched
 
 app = FastAPI()
@@ -37,6 +37,12 @@ def root():
 def read_assignments(request: Request, assignment_type: str | None = None):
     user_id = get_current_user(request)
     return get_assignments(user_id, assignment_type)
+
+# Endpoint for POST method to assignments table (ex. adding an assignment)
+@app.post("/assignments")
+def add_assignment(request: Request, assignment: AssignmentCreate):
+    user_id = get_current_user(request)
+    #reutrn the assignment creation
 
 # Endpoint for reading courses
 @app.get("/courses")

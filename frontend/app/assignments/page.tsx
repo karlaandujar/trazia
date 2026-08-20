@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Session } from "@supabase/supabase-js";
 import { getNav } from "../dashboard/page";
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 export default function Assignments() {
     type Assignment = {
@@ -13,15 +15,7 @@ export default function Assignments() {
         due_date: string;
         points: number;
         weight: number;
-    };
-
-    type Exam = {
-        id: number;
-        title: string;
-        type: string;
-        due_date: string;
-        points: number;
-        weight: number;
+        course_id: number;
     };
 
     type Course = {
@@ -39,6 +33,10 @@ export default function Assignments() {
     // Assignment addition detail variables
     const [selectedCourse, setSelectedCourse] = useState("");
     const [assignmentTitle, setAssignmentTitle] = useState("");
+    const [assignmentType, setAssignmentType] = useState("");
+    const [assignmentDueDate, setAssignmentDueDate] = useState<Date | null>(new Date());
+    const [assignmentPoints, setAssignmentPoints] = useState<number | null>(null);
+    const [assignmentWeight, setAssignmentWeight] = useState<number | null>(null);
 
 
     const router = useRouter();
@@ -59,8 +57,6 @@ export default function Assignments() {
             .then((response) => response.json())
             .then((data) => {
                 setAssignments(data);
-                console.log(data);
-                console.log(Array.isArray(data));
             });
 
             // Fetch the user courses
@@ -78,6 +74,32 @@ export default function Assignments() {
             weekday: "short",
             month: "short",
             day: "numeric"
+        });
+    }
+
+    // Variable to receive the submission of assignment addition form event and add it
+    const handleAddAssignment = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        addAssignment()
+    }
+
+    // Function to actually add an assignment
+    async function addAssignment(){
+        const token = session?.access_token;
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/assignments`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify({
+                title: assignmentTitle,
+                type: assignmentType,
+                due_date: assignmentDueDate,
+                points: assignmentPoints,
+                weight: assignmentWeight,
+                course_id: selectedCourse
+            }),
         });
     }
 
@@ -110,7 +132,7 @@ export default function Assignments() {
                     </div>
 
                     {/* Add assignments card, only shows when button is clicked */}
-                    {showAddAssignment && <div className="bg-white absolute inset-0 m-auto z-60 p-4 max-w-[calc(31%)] max-h-[calc(70%)] rounded-2xl">
+                    {showAddAssignment && <div className="bg-white absolute inset-0 m-auto z-60 p-4 max-w-[calc(31%)] max-h-[400px] rounded-2xl">
                         <div className="flex justify-between pb-5">
                             <div>
                                 <h1 className="font-semibold text-xl text-slate-800 pb-1">Add Assignment</h1>
@@ -123,27 +145,118 @@ export default function Assignments() {
                             </button>
                         </div>
 
+
                         {/* Options of details */}
-                        <div className="flex">
-                            {/* Course selection */}
-                            <div className="pr-4">
-                                <p className="font-semibold text-slate-800">Course</p>
-                                <select className="border border-gray-200 rounded-xl p-2 focus:outline-none text-slate-500" value={selectedCourse} onChange={(e) => setSelectedCourse(e.target.value)}>
-                                    <option value="">Select a course</option>
-                                        {courses.map((course) => (
-                                            <option key={course.id} value={course.id}>
-                                                {course.course_number} - {course.course_name}
-                                            </option>
-                                        ))}
-                                </select>
+                        <form onSubmit={handleAddAssignment}>
+                            <div className="grid grid-cols-2 gap-x-5 gap-y-5">                                
+                                {/* Course selection */}
+                                <div>
+                                    <p className="font-semibold text-slate-800">Course<span className="text-red-700">*</span></p>
+                                    <select 
+                                        className="border border-gray-200 rounded-xl p-2 focus:outline-none text-slate-500 w-full" 
+                                        value={selectedCourse} 
+                                        onChange={(e) => setSelectedCourse(e.target.value)}
+                                        required>
+                                        <option value="">Select a course</option>
+                                            {courses.map((course) => (
+                                                <option key={course.id} value={course.id}>
+                                                    {course.course_number} - {course.course_name}
+                                                </option>
+                                            ))}
+                                    </select>
+                                </div>
+                                
+                                {/* Assignment title */}
+                                <div>
+                                    <p className="font-semibold text-slate-800">Assignment Title<span className="text-red-700">*</span></p>
+                                    <input 
+                                        className="border border-gray-200 rounded-xl focus:outline-none p-2 w-full" 
+                                        placeholder="e.g. Exam 1, Homework 3" 
+                                        value={assignmentTitle} 
+                                        onChange={(e) => setAssignmentTitle(e.target.value)}
+                                        required />
+                                </div>
+
+                                {/* Type of assignment */}
+                                <div>
+                                    <p className="font-semibold text-slate-800">Type<span className="text-red-700">*</span></p>
+                                    <select 
+                                        className="border border-gray-200 rounded-xl p-2 focus:outline-none text-slate-500 w-full" 
+                                        value={assignmentType} 
+                                        onChange={(e) => setAssignmentType(e.target.value)}
+                                        required>
+                                        <option value="">Select type</option>
+                                        <option value="Homework">Homework</option>
+                                        <option value="Assignment">Assignment</option>
+                                        <option value="Exam">Exam</option>
+                                        <option value="Prelab">Prelab</option>
+                                        <option value="Postlab">Postlab</option>
+                                        <option value="Discussion">Discussion</option>
+                                        <option value="Participation">Participation</option>
+                                    </select>
+                                </div>
+
+                                {/* Due date */}
+                                <div>
+                                    <p className="font-semibold text-slate-800">Due Date<span className="text-red-700">*</span></p>
+                                    <DatePicker 
+                                        selected={assignmentDueDate} 
+                                        onChange={(e: Date | null) => setAssignmentDueDate(e)} 
+                                        dateFormat="yyyy-MM-dd" minDate={new Date()} 
+                                        placeholderText="Click to select a date" 
+                                        className="border border-gray-200 rounded-xl p-2 pr-12 focus:outline-none text-slate-500 w-full custom-datepicker-input"
+                                        required />
+                                </div>
+
+                                {/* Points */}
+                                <div>
+                                    <p className="font-semibold text-slate-800">Points<span className="text-red-700">*</span></p>
+                                    <input 
+                                        className="border border-gray-200 rounded-xl focus:outline-none p-2 w-full" 
+                                        type="number"
+                                        placeholder="e.g. 60" 
+                                        value={assignmentPoints ?? ""} 
+                                        onChange={(e) => {setAssignmentPoints(e.target.value === "" ? null : Number(e.target.value))}} 
+                                        required/>
+                                </div>
+
+                                {/* Weight */}
+                                <div>
+                                    <p className="font-semibold text-slate-800">Weight</p>
+                                    <input 
+                                        className="border border-gray-200 rounded-xl focus:outline-none p-2 w-full"
+                                        type="text"
+                                        inputMode="decimal"
+                                        min="0"
+                                        max="1000"
+                                        step="0.001"
+                                        placeholder="e.g. 20%" 
+                                        value={assignmentWeight ?? ""}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+
+                                            // Handle empty assignment weights
+                                            if (value === "") {
+                                                setAssignmentWeight(null);
+                                                return;
+                                            }
+                                            
+                                            // Ensure number is within range
+                                            const numberVal = Number(value)
+                                            if (numberVal >= 0 && numberVal <= 1000 ){
+                                                setAssignmentWeight(numberVal);
+                                            }
+
+                                        }} />
+                                        <span className="absolute right-7 translate-y-2 text-slate-500">%</span>
+                                </div>
+
+                                {/* Add assignment button */}
+                                <div className="absolute right-6 translate-y-65">
+                                        <button className="items-center p-2 rounded-xl bg-[#6182cd] text-white text-[15px] cursor-pointer hover:bg-slate-400" type="submit">Add Assignment</button>
+                                </div>
                             </div>
-                            
-                            {/* Assignment title */}
-                            <div>
-                                <p className="font-semibold text-slate-800">Assignment Title</p>
-                                <input className="border border-gray-200 rounded-xl focus:outline-none p-2 min-w-[120%]" placeholder="e.g. Exam 1, Homework 3" value={assignmentTitle} onChange={(e) => setAssignmentTitle(e.target.value)} />
-                            </div>
-                        </div>
+                        </form>
 
 
                     </div>}
