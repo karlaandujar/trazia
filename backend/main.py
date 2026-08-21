@@ -54,7 +54,7 @@ def read_courses(request: Request):
 @app.post("/courses")
 def add_course(request: Request, course: CourseCreate):
     user_id = get_current_user(request)
-    return create_course(course.course_name, course.course_number, course.subject, user_id)
+    return create_course(course, user_id)
 
 # Function to extract text from a PDF file
 def read_pdf(file: UploadFile):

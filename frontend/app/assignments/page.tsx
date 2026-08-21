@@ -103,6 +103,7 @@ export default function Assignments() {
         setAssignmentPoints(null);
         setAssignmentWeight(null);
         setShowAddAssignment(false);
+        
         loadAssignments();
     }
 

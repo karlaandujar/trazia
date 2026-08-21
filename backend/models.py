@@ -6,6 +6,11 @@ class CourseCreate(BaseModel):
     course_name: str
     course_number: str
     subject: str
+    prof: str
+    email: str
+    office_hours: str
+    loc: str
+    time: str
 
 class AssignmentCreate(BaseModel):
     title: str

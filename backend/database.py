@@ -72,12 +72,16 @@ def get_course_by_id(course_id, user_id):
     else:
         return None  # Return None if no course is found with the given ID
 
-def create_course(course_name: str, course_number: str, user_id):
-    if not course_name.strip() or not course_number.strip():
-        raise ValueError("Course name and course number cannot be empty.")
+def create_course(course, user_id):
     response = supabase.table("courses").insert({
-        "course_name": course_name,
-        "course_number": course_number,
+        "course_name": course.course_name,
+        "course_number": course.course_number,
+        "subject": course.subject,
+        "professor": course.prof,
+        "email": course.email,
+        "office_hours": course.office_hours,
+        "location": course.loc,
+        "time": course.time,
         "user_id": user_id
     }).execute()
     return response.data
