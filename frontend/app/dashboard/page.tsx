@@ -3,7 +3,7 @@ import supabase from "@/lib/supabase";
 import { useState, useEffect, JSX } from "react";
 import { useRouter } from "next/navigation";
 import { Session } from "@supabase/supabase-js";
-
+import next from "next";
 
 export default function Dashboard() {
     type Course = {
@@ -17,6 +17,7 @@ export default function Dashboard() {
         id: number;
         title: string;
         type: string;
+        courses: {course_number: string, course_name: string};
         due_date: string;
         points: number;
         weight: number;
@@ -26,6 +27,7 @@ export default function Dashboard() {
         id: number;
         title: string;
         type: string;
+        courses: {course_number: string, course_name: string};
         due_date: string;
         points: number;
         weight: number;
@@ -34,6 +36,7 @@ export default function Dashboard() {
     const [courses, setCourses] = useState<Course[]>([]);
     const [assignments, setAssignments] = useState<Assignment[]>([]);
     const [exams, setExams] = useState<Exam[]>([]);
+    const [weekExams, setWeekExams] = useState<Exam[]>([]);
     const [session, setSession] = useState<Session | null>(null);
     const router = useRouter();
 
@@ -94,7 +97,34 @@ export default function Dashboard() {
                 console.log(data);
                 console.log(Array.isArray(data));
             });
+
+            // Fetch only user exams this week
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/assignments?assignment_type=current_week_exams`, { headers: {"Authorization": "Bearer " + token}})
+            .then((response) => response.json())
+            .then((data) => {
+                setWeekExams(data);
+                console.log(data);
+                console.log(Array.isArray(data));
+            });
         }
+    }
+
+    // Get next assignment from already fetched assignments of this week
+    const nextAssignment = assignments[0];
+
+    // Calculate days until for next assignment
+    function getDaysUntil(dueDate: string) {
+        const now = new Date();
+        const due = new Date(dueDate);
+
+        const diff = due.getTime() - now.getTime();
+
+        const daysUntil = Math.ceil(diff / (1000*60*60*24));
+
+        // Return days if it is not today or tomorrow
+        if (daysUntil <= 0) return "Due today";
+        if (daysUntil === 1) return "Due tomorrow";
+        return `Due in ${daysUntil} days`;
     }
 
     // Load courses from backend
@@ -158,13 +188,14 @@ export default function Dashboard() {
                                 </div>
 
                                 <div>
-                                    <p className="text-2xl font-bold">{exams.length}</p>
+                                    <p className="text-2xl font-bold">{weekExams.length}</p>
                                     <p className="text-slate-700 font-semibold">Exams</p>
                                     <p className="text-slate-500">This week</p>
                                 </div>
                             </div>
                         </div>
-                        { /* Next up */ }
+                        
+                        { /* Next up assignment*/ }
                         <div className="bg-[#f7f9fa] rounded-xl min-w-[calc(30%)] min-h-[13rem] shadow-md">
                             <div className="flex pt-5 pl-4">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 mr-2 text-[#5775d6]">
@@ -174,24 +205,30 @@ export default function Dashboard() {
                                 <p className="text-[#5775d6] text-xl font-semibold">Next up</p>
                             </div>
                             
-                            <p className="text-slate-700 text-2xl font-semibold pt-3 pl-4">assignment name</p>
-                            <p className="text-slate-700 text-sm pt-1 pl-4">course number • course name</p>
+                            {/* Only show assignment if there is one available to show */}
+                            {nextAssignment ? (
+                                <>
+                                    <p className="text-slate-700 text-2xl font-semibold pt-3 pl-4">{nextAssignment.title}</p>
+                                    <p className="text-slate-700 text-sm pt-1 pl-4">{nextAssignment.courses.course_number} • {nextAssignment.courses.course_name}</p>
 
-                            <div className="flex pt-4 pl-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />
-                                </svg>
+                                    <div className="flex pt-4 pl-4">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />
+                                        </svg>
 
-                                <p className="text-slate-700 text-sm pl-2">Due in _ days, DueDateHere</p>
-                            </div>
+                                        <p className="text-slate-700 text-sm pl-2">{getDaysUntil(nextAssignment.due_date)}: {formatDate(nextAssignment.due_date)}</p>
+                                    </div>
 
-                            <button className="cursor-pointer flex border border-slate-300 min-w-[calc(100%-2rem)] text-[#5775d6] font-semibold mb-3 mt-7 pl-[calc(30%)] py-2 px-4 rounded-lg hover:bg-[#e3eaff] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 ml-4">
-                                View assignment 
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-7 pl-1">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
-                                </svg>
-                            </button>
-
+                                    <button className="cursor-pointer flex border border-slate-300 min-w-[calc(100%-2rem)] text-[#5775d6] font-semibold mb-3 mt-7 pl-[calc(30%)] py-2 px-4 rounded-lg hover:bg-[#e3eaff] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 ml-4">
+                                        View assignment 
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-7 pl-1">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
+                                        </svg>
+                                    </button>
+                                </>
+                                ) : (
+                                    <p className="text-slate-700 text-xl font-semibold pt-3 pl-4">No upcoming assignments!</p>
+                                )}
                         </div>
                     </div>
 
@@ -232,7 +269,7 @@ export default function Dashboard() {
                         {/* Upcoming assignments table */}
                         <div className="bg-white rounded-xl shadow-md p-4 min-w-[50%]">
                             <div className="relative justify-between">
-                                <h1 className="font-semibold text-xl pb-4">Upcoming Assignments</h1>
+                                <h1 className="font-semibold text-xl pb-4">Assignments This Week</h1>
                                 <button className="font-semibold text-md pt-10 text-[#5775d6] absolute right-0 -top-9 flex cursor-pointer" onClick={() => router.push("/assignments")}>
                                     View all assignments
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-7 pl-1">
@@ -255,7 +292,7 @@ export default function Dashboard() {
                                 {assignments.map((assignment) => (
                                     <tr key={assignment.id}>
                                         <td className="border-b border-gray-300 px-5 py-1 font-semibold text-slate-700">{assignment.title}</td>
-                                        <td className="border-b border-gray-300 px-4 py-1 text-slate-700">      </td>
+                                        <td className="border-b border-gray-300 px-4 py-1 text-slate-700">{assignment.courses.course_number}</td>
                                         <td className="border-b border-gray-300 px-4 py-1 text-slate-700">{formatDate(assignment.due_date)}</td>
                                         <td className="border-b border-gray-300 px-4 py-1 text-slate-700">{assignment.points}</td>
                                         <td className="border-b border-gray-300 px-4 py-1 text-slate-700">    </td>
@@ -281,7 +318,7 @@ export default function Dashboard() {
                                     {exams.map((exam) => (
                                         <tr key={exam.id}>
                                             <td className="border-b border-gray-300 px-4 py-3 text-slate-700">{formatDate(exam.due_date)}</td>
-                                            <td className="border-b border-gray-300 px-4 py-3 text-slate-700">     </td>
+                                            <td className="border-b border-gray-300 px-4 py-3 text-slate-700">{exam.courses.course_number}</td>
                                             <td className="border-b border-gray-300 px-4 py-3 text-slate-700">{exam.title}</td>
                                         </tr>
                                     ))}

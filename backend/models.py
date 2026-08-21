@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from datetime import datetime
 from uuid import UUID
 
 
@@ -15,7 +16,7 @@ class CourseCreate(BaseModel):
 class AssignmentCreate(BaseModel):
     title: str
     type: str
-    due_date: str
+    due_date: datetime
     points: int
     weight: int | None = None
     course_id: UUID

@@ -12,6 +12,7 @@ export default function Assignments() {
         id: number;
         title: string;
         type: string;
+        courses: {course_number: string, course_name: string};
         due_date: string;
         points: number;
         weight: number;
@@ -68,12 +69,21 @@ export default function Assignments() {
         }
     }
 
-    // Function to format the date nicer
+    // Function to format the date (not time) nicer
     function formatDate(date: string) {
         return new Date(date).toLocaleDateString("en-US", {
             weekday: "short",
             month: "short",
-            day: "numeric"
+            day: "numeric",
+        });
+    }
+
+    // Function to format the time nicer
+    function formatTime(date: string) {
+        return new Date(date).toLocaleTimeString("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: true
         });
     }
 
@@ -103,7 +113,6 @@ export default function Assignments() {
         setAssignmentPoints(null);
         setAssignmentWeight(null);
         setShowAddAssignment(false);
-        
         loadAssignments();
     }
 
@@ -119,7 +128,7 @@ export default function Assignments() {
             body: JSON.stringify({
                 title: assignmentTitle,
                 type: assignmentType,
-                due_date: assignmentDueDate,
+                due_date: assignmentDueDate?.toISOString(),
                 points: assignmentPoints,
                 weight: assignmentWeight,
                 course_id: selectedCourse
@@ -226,7 +235,8 @@ export default function Assignments() {
                                     <DatePicker 
                                         selected={assignmentDueDate} 
                                         onChange={(e: Date | null) => setAssignmentDueDate(e)} 
-                                        dateFormat="yyyy-MM-dd" minDate={new Date()} 
+                                        showTimeSelect
+                                        dateFormat="yyyy-MM-dd h:mm aa" minDate={new Date()} 
                                         placeholderText="Click to select a date" 
                                         className="border border-gray-200 rounded-xl p-2 pr-12 focus:outline-none text-slate-500 w-full custom-datepicker-input"
                                         required />
@@ -295,6 +305,7 @@ export default function Assignments() {
                                         <th className="border-b border-gray-300 px-4 pt-1 pb-3 font-semibold text-slate-700 text-left">Course</th>
                                         <th className="border-b border-gray-300 px-4 pt-1 pb-3 font-semibold text-slate-700 text-left">Type</th>
                                         <th className="border-b border-gray-300 px-4 pt-1 pb-3 font-semibold text-slate-700 text-left">Due Date</th>
+                                        <th className="border-b border-gray-300 px-4 pt-1 pb-3 font-semibold text-slate-700 text-left">Due Time</th>
                                         <th className="border-b border-gray-300 px-4 pt-1 pb-3 font-semibold text-slate-700 text-left">Status</th>
                                         <th className="border-b border-gray-300 px-4 pt-1 pb-3 font-semibold text-slate-700 text-left">Points</th>
                                         <th className="border-b border-gray-300 px-4 pt-1 pb-3 font-semibold text-slate-700 text-left">Progress</th>
@@ -312,7 +323,7 @@ export default function Assignments() {
 
                                             {assignment.title}
                                         </td>
-                                        <td className="border-b border-gray-200 px-4 py-1 text-slate-700">      </td>
+                                        <td className="border-b border-gray-200 px-4 py-1 text-slate-700">{assignment.courses.course_number}</td>
                                         <td className="border-b border-gray-200 px-4 py-1 text-slate-700">{assignment.type}</td>
                                         <td className="border-b border-gray-200 px-4 py-1 text-slate-700 flex">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 mr-2 block h-5 w-5 min-h-[20px] min-w-[20px]">
@@ -321,6 +332,7 @@ export default function Assignments() {
 
                                             {formatDate(assignment.due_date)}
                                         </td>
+                                        <td className="border-b border-gray-200 px-4 py-1 text-slate-700">{formatTime(assignment.due_date)}</td>
                                         <td className="border-b border-gray-200 px-4 py-1 text-slate-700">  </td>
                                         <td className="border-b border-gray-200 px-4 py-1 text-slate-700">{assignment.points}</td>
                                         <td className="border-b border-gray-200 px-4 py-1 text-slate-700">    </td>

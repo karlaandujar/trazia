@@ -35,14 +35,47 @@ def get_assignments(user_id, assignment_type):
 
     # Check for query parameter and get respective assignments
     if (assignment_type == "exam"):
-        response = supabase.table("assignments").select("*").in_("course_id", course_ids).eq("type", "Exam").execute()
+        response = supabase.table("assignments").select("""
+            *,
+            courses (
+                course_number,
+                course_name
+            )
+        """).in_("course_id", course_ids).eq("type", "Exam").execute()
     elif (assignment_type == "regular"):
-        response = supabase.table("assignments").select("*").in_("course_id", course_ids).neq("type", "Exam").execute()
+        response = supabase.table("assignments").select("""
+            *,
+            courses (
+                course_number,
+                course_name
+            )
+        """).in_("course_id", course_ids).neq("type", "Exam").execute()
     elif (assignment_type == "current_week"):
         start, end = get_current_week()
-        response = supabase.table("assignments").select("*").in_("course_id", course_ids).gte("due_date", start).lte("due_date", end).execute()
+        response = supabase.table("assignments").select("""
+            *,
+            courses (
+                course_number,
+                course_name
+            )
+        """).in_("course_id", course_ids).limit(1).gte("due_date", start).lte("due_date", end).neq("type", "Exam").execute()
+    elif (assignment_type == "current_week_exams"):
+            start, end = get_current_week()
+            response = supabase.table("assignments").select("""
+                *,
+                courses (
+                    course_number,
+                    course_name
+                )
+            """).in_("course_id", course_ids).limit(1).gte("due_date", start).lte("due_date", end).eq("type", "Exam").execute()
     else:
-        response = supabase.table("assignments").select("*").in_("course_id", course_ids).execute()
+        response = supabase.table("assignments").select("""
+            *,
+            courses (
+                course_number,
+                course_name
+            )
+        """).in_("course_id", course_ids).execute()
     
     return response.data
 
@@ -52,7 +85,7 @@ def create_assignment(assignment):
         "course_id": str(assignment.course_id),
         "title": assignment.title,
         "type": assignment.type,
-        "due_date": assignment.due_date,
+        "due_date": assignment.due_date.isoformat(),
         "points": assignment.points,
         "weight": assignment.weight
     }).execute()
