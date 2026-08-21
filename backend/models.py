@@ -5,12 +5,12 @@ from uuid import UUID
 class CourseCreate(BaseModel):
     course_name: str
     course_number: str
-    subject: str
-    prof: str
-    email: str
-    office_hours: str
-    loc: str
-    time: str
+    subject: str | None = None
+    prof: str | None = None
+    email: str | None = None
+    office_hours: str | None = None
+    loc: str | None = None
+    time: str | None = None
 
 class AssignmentCreate(BaseModel):
     title: str

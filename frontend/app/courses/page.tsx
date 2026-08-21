@@ -254,6 +254,7 @@ export default function Courses() {
                                     <input
                                         className="border border-gray-200 rounded-xl p-2 focus:outline-none text-slate-500 w-full"
                                         value={courseEmail ?? ""}
+                                        type="email"
                                         placeholder="e.g. smith@vt.edu"
                                         onChange={(e) => setCourseEmail(e.target.value)}>                                
                                     </input>
