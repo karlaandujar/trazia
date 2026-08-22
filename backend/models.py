@@ -20,3 +20,15 @@ class AssignmentCreate(BaseModel):
     points: int
     weight: int | None = None
     course_id: UUID
+
+class BulkAssignmentCreate(BaseModel):
+    course_id: UUID
+    assignments: list[ExtractedAssignment]
+
+# Separate model for extracted assignment since may contain many nulls
+class ExtractedAssignment(BaseModel):
+    title: str
+    type: str | None = None
+    due_date: datetime | None = None
+    points: int | None = None
+    weight: int | None = None

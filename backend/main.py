@@ -1,9 +1,9 @@
 from uuid import UUID
-from fastapi import FastAPI, UploadFile, Form, Request, HTTPException
+from fastapi import FastAPI, File, UploadFile, Form, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pypdf import PdfReader
 from database import get_courses, create_course, get_course_by_id, get_user, upload_assignments, get_assignments, create_assignment
-from models import CourseCreate, AssignmentCreate
+from models import CourseCreate, AssignmentCreate, BulkAssignmentCreate
 from ai import get_assignments_from_sched
 
 app = FastAPI()
@@ -39,10 +39,24 @@ def read_assignments(request: Request, assignment_type: str | None = None):
     return get_assignments(user_id, assignment_type)
 
 # Endpoint for POST method to assignments table (ex. adding an assignment)
-@app.post("/assignments")
-def add_assignment(request: Request, assignment: AssignmentCreate):
-    user_id = get_current_user(request)
+@app.post("/singularAssignment")
+def add_assignment(assignment: AssignmentCreate):
     return create_assignment(assignment)
+
+# Endpoint for POST method to assignments table with multiple assignments
+@app.post("/bulkAssignments")
+def add_assignments(request: Request, bulk_data: BulkAssignmentCreate):
+    user_id = get_current_user(request)
+    # Get valid course that the assignments belong to
+    course = get_course_by_id(bulk_data.course_id, user_id)
+    if (course is None):
+        raise HTTPException(
+            status_code=404,
+            detail="Null course"
+        )
+
+    # Now upload all the assignments
+    upload_assignments(bulk_data.course_id, bulk_data.assignments)
 
 # Endpoint for reading courses
 @app.get("/courses")
@@ -64,11 +78,10 @@ def read_pdf(file: UploadFile):
         text += page.extract_text()
     return text
 
-# Endpoint for uploading a PDF file
-@app.post("/upload/")
-async def upload_schedule(request: Request, file: UploadFile, course_id: UUID = Form(...)):
+# Endpoint for getting the assignments via an upload in the add assignments card (optional file and text since only one is uploaded)
+@app.post("/uploadAssignments/")
+async def upload_schedule(request: Request, file: UploadFile | None = File(None), pastedText: str | None = Form(None), course_id: UUID = Form(...)):
     user_id = get_current_user(request)
-    text = read_pdf(file)
     # Get valid course that the assignments belong to
     course = get_course_by_id(course_id, user_id)
     if (course is None):
@@ -77,6 +90,25 @@ async def upload_schedule(request: Request, file: UploadFile, course_id: UUID = 
             detail="Null course"
         )
 
-    assignments = get_assignments_from_sched(text)
-    upload_assignments(course_id, assignments)
-    return "Upload schedule success"
+    # Verify that either but not none or both file and text are uploaded
+    if file is None and pastedText is None: 
+        raise HTTPException(
+            status_code=400,
+            detail="Provide a file or a pasted text."
+        )
+    if file is not None and pastedText is not None:
+        raise HTTPException(
+            status_code=400,
+            detail="Please only provide either a file or a pasted text, not both."
+        )
+
+    # Extract from file if a file was provided
+    if file is not None:
+        text = read_pdf(file)
+        assignments = get_assignments_from_sched(text)
+
+    # Otherwise extract from text since text was provided
+    else: 
+        assignments = get_assignments_from_sched(pastedText)
+
+    return assignments

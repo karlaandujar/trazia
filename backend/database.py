@@ -119,14 +119,20 @@ def create_course(course, user_id):
     }).execute()
     return response.data
 
-def upload_assignments(course_id, dictionary):
-    for assignment in dictionary["assignments"]:
-        response = supabase.table("assignments").insert({
+def upload_assignments(course_id, assignments):
+    # Save each assignment into a row and insert together
+    rows = []
+
+    for assignment in assignments:
+        rows.append({
             "course_id": str(course_id),
-            "title": assignment["title"],
-            "type": assignment["type"],
-            "due_date": assignment["due_date"],
-            "points": assignment["points"],
-            "weight": assignment["weight"]
-        }).execute()
+            "title": assignment.title,
+            "type": assignment.type,
+            "due_date": assignment.due_date.isoformat(),
+            "points": assignment.points,
+            "weight": assignment.weight
+        })
+
+    response = supabase.table("assignments").insert(rows).execute()
+    return response.data
 

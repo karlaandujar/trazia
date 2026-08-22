@@ -19,14 +19,14 @@ def get_assignments_from_sched(text):
               {{
                 "title": "Assignment", 
                 "type": "Homework", 
-                "due_date": "2023-10-15", 
+                "due_date": "2026-08-31T23:59:00", 
                 "points": 25, 
                 "weight": 0.2
               }}, 
               {{
                 "title": "Midterm 1",
                 "type": "Exam", 
-                "due_date": "2026-10-15", 
+                "due_date": "2026-09-31T21:59:00", 
                 "points": 100, 
                 "weight": 0.50,
                 "subject": CS
@@ -35,7 +35,7 @@ def get_assignments_from_sched(text):
         }}
 
         It is okay to leave what is not stated as a null or default value. Do not wrap the response in Markdown code fences. Do not include explanations or commentary. Infer 1-3 characters for the subject using the course number; 
-        for example if the course is PHYS 1101, the subject would be 'PH' or the subject for math would be 'MA'. Use the type values like "Homework", "Assignment", "Quiz", "Exam", "Pre-Lab", "Post-Lab", "Discussion", and "Participation" {sched}""".format(sched=text)
+        for example if the course is PHYS 1101, the subject would be 'PH' or the subject for math would be 'MA'. Only return due dates that are valid calendar dates. Use the type values like "Homework", "Assignment", "Quiz", "Exam", "Pre-Lab", "Post-Lab", "Discussion", and "Participation" {sched}""".format(sched=text)
     )
     # Convert the JSON into a dictionary and return
     try:

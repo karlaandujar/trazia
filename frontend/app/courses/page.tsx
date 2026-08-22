@@ -7,7 +7,7 @@ import { getNav } from "../dashboard/page";
 
 export default function Courses() {
     type Course = {
-        id: number;
+        id: string;
         course_number: string;
         course_name: string;
         subject: string;
@@ -60,27 +60,6 @@ export default function Courses() {
     useEffect(() => {
         loadData()
     }, []);
-
-    // Function that handles PDF uploads for course additions
-    async function handleFileUpload() {
-        if (!file) {
-            alert("Please select a file to upload.");
-            return;
-        }
-        // Get user token and create form with necessary data
-        const token = session?.access_token;
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("course_id", selectedCourse);
-        // POST method to send the file to the backend
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/`, {
-            method: "POST",
-            headers: {
-                "Authorization": "Bearer " + token
-            },
-            body: formData
-        });
-    }
 
     // Helper function to load courses table upon course addition
     async function loadCourses() {
@@ -156,7 +135,7 @@ export default function Courses() {
 
     return(
         /* Overlay on entire div if the card is open */
-        <div className={`px-2 py-2 ${showAddCourse ? 'before:absolute before:inset-0 before:z-50 before:bg-black/30' : '' }`}>
+        <div className={`px-2 py-2 ${showAddCourse ? 'before:fixed before:absolute before:inset-0 before:z-50 before:bg-black/30' : '' }`}>
             <div className="bg-white rounded-3xl shadow-sm overflow-hidden min-h-[calc(100vh-1rem)] max-w-[calc(100vw-1rem)]">
                 {/* Navigation bar */}
                 { getNav() }
@@ -320,17 +299,7 @@ export default function Courses() {
 
                         {/* File uploads */}
                         {activeTab === "upload" && (<div>
-                            <select className="border p-2 ml-4" value={selectedCourse} onChange={(e) => setSelectedCourse(e.target.value)}>
-                                <option value="">Select a course</option>
-                                {courses.map((course) => (
-                                    <option key={course.id} value={course.id}>
-                                        {course.course_number} - {course.course_name}
-                                    </option>
-                                ))}
-                            </select>
-
-                            <input className="border ml-4 p-2 mt-2 cursor-pointer hover:bg-gray-200" type="file" onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)} />
-                            <button className="p-2 ml-2 rounded hover:bg-blue-200 border cursor-pointer" onClick={handleFileUpload}>Upload Course Schedule</button>
+                            
                         </div>)}
 
                     </div>

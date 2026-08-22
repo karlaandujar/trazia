@@ -16,20 +16,23 @@ export default function Assignments() {
         due_date: string;
         points: number;
         weight: number;
-        course_id: number;
+        course_id: string;
     };
 
     type Course = {
-        id: number;
+        id: string;
         course_number: string;
         course_name: string;
         subject: string;
     };
 
     const [showAddAssignment, setShowAddAssignment] = useState(false);
+    const [showVerify, setShowVerify] = useState(false);
     const [session, setSession] = useState<Session | null>(null);
     const [courses, setCourses] = useState<Course[]>([]);
     const [assignments, setAssignments] = useState<Assignment[]>([]);
+    const [activeTab, setActiveTab] = useState("manual");
+    const [extractedAssignments, setExtractedAssignments] = useState([]);
 
     // Assignment addition detail variables
     const [selectedCourse, setSelectedCourse] = useState("");
@@ -38,6 +41,8 @@ export default function Assignments() {
     const [assignmentDueDate, setAssignmentDueDate] = useState<Date | null>(new Date());
     const [assignmentPoints, setAssignmentPoints] = useState<number | null>(null);
     const [assignmentWeight, setAssignmentWeight] = useState<number | null>(null);
+    const [file, setFile] = useState<File | null>(null);
+    const [pasted, setPasted] = useState("");
 
 
     const router = useRouter();
@@ -87,6 +92,62 @@ export default function Assignments() {
         });
     }
 
+    // Function that handles PDF uploads or pasted text for assignment additions
+    async function handleExtract() {
+        // Flags for if there is a file or pasted text
+        const hasFile = !!file;
+        const hasText = pasted.trim().length > 0;
+        
+        // Ensure that EITHER a file is uploaded or text is pasted
+        if (!hasFile && !hasText) {
+            alert("Please upload a file or paste a course schedule/assignment list.");
+            return;
+        }
+        if (hasFile && hasText) {
+            alert("Please only upload a file OR paste text, not both.");
+            return;
+        }
+        // Ensure a course is selected
+        if (selectedCourse === "") {
+            alert("Please select a course for these assignments.");
+            return;
+        }
+
+        // Get user token and create form with necessary data
+        const token = session?.access_token;
+        const formData = new FormData();
+        formData.append("course_id", selectedCourse);
+
+        // Append whatever was uploaded
+        if (hasFile) formData.append("file", file);
+        else formData.append("pastedText", pasted);
+
+        // POST method to send the form to the backend
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/uploadAssignments/`, {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + token
+            },
+            body: formData
+        });
+
+        // Convert assignments to an array and save it
+        const data = await response.json();
+        setExtractedAssignments(data.assignments);
+
+        // Switch from add assignments card to review card (human verification step)
+        /*setSelectedCourse("");
+        setAssignmentTitle("");
+        setAssignmentType("");
+        setAssignmentDueDate(null);
+        setAssignmentPoints(null);
+        setAssignmentWeight(null);
+        */
+        // setShowAddAssignment(false);
+        setShowVerify(true);
+    }
+
+
     // Helper function to load assignments table upon assignment addition
     async function loadAssignments() {
         const token = session?.access_token;
@@ -101,7 +162,7 @@ export default function Assignments() {
         setAssignments(data);
     }
 
-    // Variable to receive the submission of assignment addition form event and add it
+    // Variable to receive the submission of manual assignment addition form event and add it
     const handleAddAssignment = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         await addAssignment();
@@ -116,10 +177,10 @@ export default function Assignments() {
         loadAssignments();
     }
 
-    // Function to actually add an assignment
+    // Function to add a singular assignment
     async function addAssignment(){
         const token = session?.access_token;
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/assignments`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/singularAssignment`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -136,6 +197,26 @@ export default function Assignments() {
         });
     }
 
+    // Function to add a bulk of assignments
+    async function handleAddBulkAssignments() {
+        const token = session?.access_token;
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bulkAssignments`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify({
+                course_id: selectedCourse,
+                assignments: extractedAssignments
+            })
+        })
+
+        setExtractedAssignments([]);
+        setShowVerify(false);
+        loadAssignments();
+    }
+
     // Load courses from backend
     useEffect(() => {
         loadData()
@@ -143,7 +224,7 @@ export default function Assignments() {
 
     return (
         /* Overlay on entire div if the add assignment card is open */
-        <div className={`px-2 py-2 ${showAddAssignment ? 'before:absolute before:inset-0 before:z-50 before:bg-black/30' : '' }`}>
+        <div className={`px-2 py-2 ${showAddAssignment ? 'before:fixed before:absolute before:inset-0 before:z-50 before:bg-black/30' : '' }`}>
             <div className="bg-white rounded-3xl shadow-sm overflow-hidden min-h-[calc(100vh-1rem)] max-w-[calc(100vw-1rem)]">
                 {/* Navigation bar */}
                 { getNav() }
@@ -165,7 +246,7 @@ export default function Assignments() {
                     </div>
 
                     {/* Add assignments card, only shows when button is clicked */}
-                    {showAddAssignment && <div className="bg-white absolute inset-0 m-auto z-60 p-4 max-w-[calc(31%)] max-h-[400px] rounded-2xl">
+                    {showAddAssignment && <div className="bg-white absolute inset-0 m-auto z-60 p-4 max-w-[calc(35%)] h-fit rounded-2xl">
                         <div className="flex justify-between pb-5">
                             <div>
                                 <h1 className="font-semibold text-xl text-slate-800 pb-1">Add Assignment</h1>
@@ -178,10 +259,25 @@ export default function Assignments() {
                             </button>
                         </div>
 
+                        {/* Tabs for manual entry or upload */}
+                        <div className="flex justify-center pb-3">
+                            <button 
+                                className="cursor-pointer border border-gray-300 rounded-xs py-2 px-10 hover:bg-gray-100" 
+                                onClick={() => setActiveTab("manual")}><span className="font-semibold text-md text-slate-800">Manual Entry</span>
+                                <p className="text-slate-500 text-xs">Type in the details</p>
+                            </button>
 
-                        {/* Options of details */}
-                        <form onSubmit={handleAddAssignment}>
-                            <div className="grid grid-cols-2 gap-x-5 gap-y-5">                                
+                            <button 
+                                className="cursor-pointer border border-gray-300 rounded-xs py-2 px-6 hover:bg-gray-100" 
+                                onClick={() => setActiveTab("upload")}><span className="font-semibold text-md text-slate-800">Upload File</span>
+                                <p className="text-slate-500 text-xs">Upload a course schedule or list of assignments to auto-fill</p>
+                            </button>
+                        </div>
+
+
+                        {/* Manual assignment additions */}
+                        {activeTab === "manual" && (<form onSubmit={handleAddAssignment}>
+                            <div className="grid grid-cols-2 gap-x-5 gap-y-5 pb-15">                                
                                 {/* Course selection */}
                                 <div>
                                     <p className="font-semibold text-slate-800">Course<span className="text-red-700">*</span></p>
@@ -290,11 +386,100 @@ export default function Assignments() {
                                         <button className="items-center p-2 rounded-xl bg-[#6182cd] text-white text-[15px] cursor-pointer hover:bg-slate-400" type="submit">Add Assignment</button>
                                 </div>
                             </div>
-                        </form>
+                        </form>)}
 
+                        
+                        {/* Upload assignment additions */}
+                        {activeTab === "upload" && (<div className="pb-8">
+                            {/* Course selection */}
+                            <div>
+                                <p className="font-semibold text-slate-800">Course<span className="text-red-700">*</span></p>
+                                <select 
+                                    className="border border-gray-200 rounded-xl p-2 focus:outline-none text-slate-500 w-full" 
+                                    value={selectedCourse} 
+                                    onChange={(e) => setSelectedCourse(e.target.value)}
+                                    required>
+                                    <option value="">Select a course</option>
+                                        {courses.map((course) => (
+                                            <option key={course.id} value={course.id}>
+                                                {course.course_number} - {course.course_name}
+                                            </option>
+                                        ))}
+                                </select>
+                            </div>
 
+                            {/* File upload */}
+                            <label className="border border-gray-300 border-dashed bg-gray-50 flex mt-2 rounded-xl p-3 cursor-pointer hover:bg-gray-100 transition-colors">
+                                {/* Hidden native file input */}
+                                <input type="file" accept=".pdf" className="hidden" onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}/>
+                                <div className="bg-[#e2eafb] rounded-xl p-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-11 text-[#1361d7]">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z" />
+                                    </svg>
+                                </div>
+                                    
+                                <div className="pl-6">
+                                    <p className="font-semibold text-slate-800">Upload File</p>
+                                    <p className="text-slate-700 text-xs">Click to browse and upload a course schedule or list of assignments</p>
+                                    <p className="text-slate-700 text-xs">Supports PDF</p>
+                                </div>
+                            </label>
+
+                            {/* Middle line to separate upload and copy/paste text */}
+                            <div className="flex items-center gap-3 py-2">
+                                <hr className="flex-1 border-gray-200"></hr>
+                                <span className="text-sm text-gray-400">or</span>
+                                <hr className="flex-1 border-gray-200"></hr>
+                            </div> 
+                            
+                            {/* Paste text box */}
+                            <div className="pb-3">
+                                <p className="font-semibold text-slate-800">Paste Schedule / Assignment List</p>
+                                <textarea 
+                                    rows={4} 
+                                    placeholder="Paste your syllabus or assignment list here..." 
+                                    className="p-1 rounded-lg border border-gray-300 focus:outline-none w-full resize-none"
+                                    onChange={(e) => setPasted(e.target.value)}                                    
+                                    ></textarea>
+                            </div>
+                            
+                            {/* Button to extract assignments */}
+                            <div className="absolute right-6 -translate-y-1">
+                                <button className="items-center p-2 rounded-xl bg-[#6182cd] text-white text-[15px] cursor-pointer hover:bg-slate-400" onClick={handleExtract}>Extract Assignments</button>
+                            </div>
+                        </div>)}
                     </div>}
 
+                    
+                    {/* Human verification card - shows when file or text is uploaded */}
+                    {showVerify && <div className="bg-white absolute inset-0 m-auto z-60 p-4 max-w-[calc(35%)] h-fit rounded-2xl">
+                        {/* Headers */}
+                         <div className="flex justify-between pb-5">
+                            <div>
+                                <h1 className="font-semibold text-xl text-slate-800 pb-1">Review Extracted Assignments</h1>
+                                <h3 className="text-slate-600 text-sm">We extracted the following assignments. Please review and confirm.</h3>
+                            </div>
+                            {/* button to close out of card, not sure if want this yet <button className="cursor-pointer text-2xl" onClick={() => setShowVerify(false)}>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-7">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                </svg> 
+                            </button> */}
+                        </div>
+
+                        {/* Course */}
+                        {/* find whose id is selected course from courses and then display that name and number */}
+                        <div> Course Name: {courses.find(course => course.id === selectedCourse)?.course_name || "idk" }</div>
+
+                        {/* Table with all extracted assignments */}
+                        <pre>
+                            {JSON.stringify(extractedAssignments, null, 2)}
+                        </pre>
+
+                        {/* Summary */}
+
+                        {/* Confirm and add button */}
+                        <button onClick={handleAddBulkAssignments}>Confirm & Add Assignments</button>
+                    </div>}
 
                     {/* Assignments table */}
                     <div className="bg-white rounded-xl shadow-md p-4 min-w-[50%]">
