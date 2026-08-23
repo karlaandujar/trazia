@@ -26,16 +26,26 @@ export default function Assignments() {
         subject: string;
     };
 
+    type ExtractedAssignment = {
+        title: string;
+        type: string | null;
+        due_date: string | null;
+        points: string | null;
+        weight: number | null;
+        subject?: string | null;
+    };
+
     const [showAddAssignment, setShowAddAssignment] = useState(false);
     const [showVerify, setShowVerify] = useState(false);
     const [session, setSession] = useState<Session | null>(null);
     const [courses, setCourses] = useState<Course[]>([]);
     const [assignments, setAssignments] = useState<Assignment[]>([]);
     const [activeTab, setActiveTab] = useState("manual");
-    const [extractedAssignments, setExtractedAssignments] = useState([]);
+    const [extractedAssignments, setExtractedAssignments] = useState<ExtractedAssignment[]>([]);
 
     // Assignment addition detail variables
     const [selectedCourse, setSelectedCourse] = useState("");
+    const selectedCourseInfo = courses.find( (course) => course.id === selectedCourse);
     const [assignmentTitle, setAssignmentTitle] = useState("");
     const [assignmentType, setAssignmentType] = useState("");
     const [assignmentDueDate, setAssignmentDueDate] = useState<Date | null>(new Date());
@@ -136,14 +146,13 @@ export default function Assignments() {
         setExtractedAssignments(data.assignments);
 
         // Switch from add assignments card to review card (human verification step)
-        /*setSelectedCourse("");
+        setSelectedCourse("");
         setAssignmentTitle("");
         setAssignmentType("");
         setAssignmentDueDate(null);
         setAssignmentPoints(null);
         setAssignmentWeight(null);
-        */
-        // setShowAddAssignment(false);
+        setShowAddAssignment(false);
         setShowVerify(true);
     }
 
@@ -208,7 +217,7 @@ export default function Assignments() {
             },
             body: JSON.stringify({
                 course_id: selectedCourse,
-                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone;,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
                 assignments: extractedAssignments
             })
         })
@@ -225,7 +234,7 @@ export default function Assignments() {
 
     return (
         /* Overlay on entire div if the add assignment card is open */
-        <div className={`px-2 py-2 ${showAddAssignment ? 'before:fixed before:absolute before:inset-0 before:z-50 before:bg-black/30' : '' }`}>
+        <div className={`px-2 py-2 ${(showAddAssignment || showVerify) ? 'before:fixed before:absolute before:inset-0 before:z-50 before:bg-black/30' : '' }`}>
             <div className="bg-white rounded-3xl shadow-sm overflow-hidden min-h-[calc(100vh-1rem)] max-w-[calc(100vw-1rem)]">
                 {/* Navigation bar */}
                 { getNav() }
@@ -468,13 +477,35 @@ export default function Assignments() {
                         </div>
 
                         {/* Course */}
-                        {/* find whose id is selected course from courses and then display that name and number */}
-                        <div> Course Name: {courses.find(course => course.id === selectedCourse)?.course_name || "idk" }</div>
+                        <div className="font-semibold text-slate-800"> {selectedCourseInfo?.course_number} - {selectedCourseInfo?.course_name} </div>
 
                         {/* Table with all extracted assignments */}
-                        <pre>
-                            {JSON.stringify(extractedAssignments, null, 2)}
-                        </pre>
+                        <div>
+                            <table className="w-full text-sm">
+                                <thead className="border-b border-gray-200 text-slate-500">
+                                    <tr>
+                                        <th className="pb-3 pr-3 text-left">Title</th>
+                                        <th className="pb-3 pr-3 text-left">Type</th>
+                                        <th className="pb-3 pr-3 text-left">Due Date</th>
+                                        <th className="pb-3 pr-3 text-left">Points</th>
+                                        <th className="pb-3 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {extractedAssignments.map((assignment, index) => (
+                                        <tr key={index} className="border-b border-gray-100">
+                                            <td className="py-3 pr-3 font-medium text-slate-800">{assignment.title}</td>
+                                            <td className="py-3 pr-3 text-slate-700">{assignment.type}</td>
+                                            <td className="py-3 pr-3 text-slate-700">{assignment.due_date}</td>
+                                            <td className="py-3 pr-3 text-slate-700">{assignment.points ?? "-"}</td>
+                                            <td className="py-3 text-right text-slate-700"> <button className="mr-3 cursor-pointer"> Edit </button></td>
+                                            <td className="py-3 text-right text-slate-700"> <button className="mr-3 cursor-pointer"> Delete </button></td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
 
                         {/* Summary */}
 
