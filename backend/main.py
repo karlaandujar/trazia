@@ -56,7 +56,7 @@ def add_assignments(request: Request, bulk_data: BulkAssignmentCreate):
         )
 
     # Now upload all the assignments
-    upload_assignments(bulk_data.course_id, bulk_data.assignments)
+    return upload_assignments(bulk_data.course_id, bulk_data.assignments, bulk_data.timezone)
 
 # Endpoint for reading courses
 @app.get("/courses")

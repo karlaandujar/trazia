@@ -208,6 +208,7 @@ export default function Assignments() {
             },
             body: JSON.stringify({
                 course_id: selectedCourse,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone;,
                 assignments: extractedAssignments
             })
         })

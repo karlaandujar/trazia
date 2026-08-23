@@ -23,6 +23,7 @@ class AssignmentCreate(BaseModel):
 
 class BulkAssignmentCreate(BaseModel):
     course_id: UUID
+    timezone: str
     assignments: list[ExtractedAssignment]
 
 # Separate model for extracted assignment since may contain many nulls

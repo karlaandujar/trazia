@@ -2,6 +2,7 @@ import os
 from supabase import create_client, Client
 from dotenv import load_dotenv
 from datetime import datetime, date, timedelta
+from zoneinfo import ZoneInfo
 
 
 # Load environment variables from .env file
@@ -119,16 +120,24 @@ def create_course(course, user_id):
     }).execute()
     return response.data
 
-def upload_assignments(course_id, assignments):
+def upload_assignments(course_id, assignments, timezone):
     # Save each assignment into a row and insert together
     rows = []
 
+    user_timezone = ZoneInfo(timezone)
+
     for assignment in assignments:
+        due_date = assignment.due_date
+
+        # If there is no timezone with the datetime, give it one
+        if due_date is not None and due_date.tzinfo is None:
+            due_date = due_date.replace(tzinfo=user_timezone)
+        
         rows.append({
             "course_id": str(course_id),
             "title": assignment.title,
             "type": assignment.type,
-            "due_date": assignment.due_date.isoformat(),
+            "due_date": assignment.due_date.isoformat() if due_date else None,
             "points": assignment.points,
             "weight": assignment.weight
         })
