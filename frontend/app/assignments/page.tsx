@@ -429,7 +429,8 @@ export default function Assignments() {
                                 </div>
                                     
                                 <div className="pl-6">
-                                    <p className="font-semibold text-slate-800">Upload File</p>
+                                    {/* Show the file name when it is uploaded */}
+                                    <p className="font-semibold text-slate-800">{file ? file.name : "Upload File"}</p>
                                     <p className="text-slate-700 text-xs">Click to browse and upload a course schedule or list of assignments</p>
                                     <p className="text-slate-700 text-xs">Supports PDF</p>
                                 </div>
