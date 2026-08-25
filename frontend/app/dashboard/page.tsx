@@ -135,7 +135,7 @@ export default function Dashboard() {
 
     return (
         <div className="px-2 py-2">
-            <div className="bg-white pb-2 rounded-3xl shadow-sm overflow-hidden min-h-[calc(100vh-1rem)] max-w-[calc(100vw-1rem)]">
+            <div className="bg-white pb-3 rounded-3xl shadow-sm overflow-hidden min-h-[calc(100vh-1rem)] max-w-[calc(100vw-1rem)]">
                 {/* Navigation bar */}
                 { getNav() }
 
