@@ -393,7 +393,9 @@ export default function Assignments() {
 
                                 {/* Add assignment button */}
                                 <div className="absolute right-6 translate-y-65">
-                                        <button className="items-center p-2 rounded-xl bg-[#6182cd] text-white text-[15px] cursor-pointer hover:bg-slate-400" type="submit">Add Assignment</button>
+                                        <button 
+                                            className="items-center p-2 rounded-xl bg-[#6182cd] text-white text-[15px] cursor-pointer hover:bg-slate-400" 
+                                            type="submit">Add Assignment</button>
                                 </div>
                             </div>
                         </form>)}
