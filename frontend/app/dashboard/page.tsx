@@ -358,7 +358,7 @@ export default function Dashboard() {
 
                             <div className="flex items-center absolute right-0 inset-y-0 gap-3">
                                 <img className="h-13 w-13 rounded-full cursor-pointer" src="/notification.png" alt="Notification" />
-                                <img className="h-13 w-13 rounded-full cursor-pointer" src="/profile.png" alt="Profile" />
+                                <img className="h-13 w-13 rounded-full cursor-pointer" src="/profile.png" alt="Profile" onClick={() => router.push("/profile")} />
                             </div>
                         </div>
                     </div>
