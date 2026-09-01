@@ -34,15 +34,26 @@ export default function Profile(){
                         </div>
 
                         {/* 2 cards for account info and preferences */}
-                        <div className="flex justify-evenly">
+                        <div className="flex justify-evenly mt-2">
                             {/* Account info */}
-                            <div className="border border-slate-300 rounded-lg">
-                                <h1>Account Information</h1>
+                            <div className="border border-slate-300 rounded-lg w-[calc(50%-1rem)]">
+                                <h1 className="ml-4 m-2">Account Information</h1>
+                                <div className="ml-7">
+                                    <p>full name</p>
+                                    <p>email</p>
+                                    <p>school</p>
+                                    <p>major</p>
+                                    <p>year</p>
+                                    <p>timezone</p>
+                                </div>
                             </div>
 
                             {/* Preferences */}
-                            <div className="border border-slate-300 rounded-lg">
-                                <h1>Preferences</h1>
+                            <div className="border border-slate-300 rounded-lg w-[calc(50%-1rem)]">
+                                <h1 className="ml-4 m-2">Preferences</h1>
+                                <div className="ml-7">
+                                    <p>more coming soon...</p>
+                                </div>
                             </div>
 
                         </div>
