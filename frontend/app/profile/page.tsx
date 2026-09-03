@@ -34,7 +34,7 @@ export default function Profile(){
                         </div>
 
                         {/* 2 cards for account info and preferences */}
-                        <div className="flex justify-evenly mt-2">
+                        <div className="flex justify-evenly mt-2 mb-1">
                             {/* Account info */}
                             <div className="border border-slate-300 rounded-lg w-[calc(50%-1rem)]">
                                 <h1 className="ml-4 m-2">Account Information</h1>
