@@ -43,7 +43,7 @@ export default function Profile(){
                                     <p>email</p>
                                     <p>school</p>
                                     <p>major</p>
-                                    <p>year</p>
+                                    <p>year/ class of XXXX </p>
                                     <p>timezone</p>
                                 </div>
                             </div>
