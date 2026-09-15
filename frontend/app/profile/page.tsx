@@ -52,7 +52,7 @@ export default function Profile(){
                             <div className="border border-slate-300 rounded-lg w-[calc(50%-1rem)]">
                                 <h1 className="ml-4 m-2">Preferences</h1>
                                 <div className="ml-7">
-                                    <p>more coming soon...</p>
+                                    <p>theme</p>
                                 </div>
                             </div>
 
