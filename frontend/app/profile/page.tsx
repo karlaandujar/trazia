@@ -41,7 +41,7 @@ export default function Profile(){
                                     <h2 className="text-xl font-semibold mb-4">Set Profile Picture</h2>
                                     <input type="file" accept="image/*" className="mb-4" />
                                 </div>
-                                <p onClick={() => setShowSetProfile(false)} className="text-gray-500 hover:text-gray-700 text-size-lg cursor-pointer">x</p>
+                                <p onClick={() => setShowSetProfile(false)} className="text-gray-800 hover:text-gray-900 text-xl cursor-pointer relative -inset-y-12 -inset-x-6">x</p>
                             </div>
                         )}
 
